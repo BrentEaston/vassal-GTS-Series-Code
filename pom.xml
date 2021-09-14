@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.vassalengine</groupId>
-  <artifactId>module-template</artifactId>
+  <artifactId>vassal-GTS-Series-Code</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
     <!-- set Vassal version here -->
-    <vassal.version>3.6.0-SNAPSHOT</vassal.version>
+    <vassal.version>3.5.8</vassal.version>
 
     <!-- set Java version here -->
     <maven.compiler.source>11</maven.compiler.source>

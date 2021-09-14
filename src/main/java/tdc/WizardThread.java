@@ -893,7 +893,7 @@ public class WizardThread extends AbstractConfigurable implements MouseListener,
     if (active && visible && !persisting && !mirroring) {
       // retainAfterRelease = true;
 
-      setCtrlKeyDepressed((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK);
+      setCtrlKeyDepressed((e.getModifiersEx() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK);
 
       Point p = e.getPoint();
 

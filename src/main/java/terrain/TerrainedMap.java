@@ -83,7 +83,7 @@ public class TerrainedMap extends Map {
 
   // Is this map the main map?
   public boolean isAttached() {
-    return !launchButton.isVisible();
+    return !getLaunchButton().isVisible();
   }
 
   // Is this map visible?
