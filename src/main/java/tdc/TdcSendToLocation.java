@@ -62,7 +62,7 @@ import VASSAL.tools.SequenceEncoder;
 
 /**
  * This traitadds a command that sends a piece to a particular location ona particular
- * board of a particular Map.
+ * board of a particular  Map.
  */
 public class TdcSendToLocation extends Decorator implements EditablePiece {
   public static final String ID = "tdcsendto;";

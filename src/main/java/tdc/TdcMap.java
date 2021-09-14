@@ -146,7 +146,7 @@ public class TdcMap extends Map {
 
   // Is this map the main map?
   protected boolean isAttached() {
-    return !launchButton.isVisible();
+    return !getLaunchButton().isVisible();
   }
 
   // Is this map visible?
