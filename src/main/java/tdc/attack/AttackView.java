@@ -196,7 +196,7 @@ public class AttackView {
     ratingPanel.add(myWizard.getResolver().getControls(), "wrap");
 
     final JPanel smallPanel = new JPanel(new MigLayout("ins 0", "[][]"));
-    smallPanel.add(checkBoxRawFireRating);
+    // smallPanel.add(checkBoxRawFireRating); Hide Raw Assault rating box for now
     smallPanel.add(checkBoxAssaultFireRating);
     ratingPanel.add(smallPanel);
         
