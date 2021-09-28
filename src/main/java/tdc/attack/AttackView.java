@@ -174,7 +174,8 @@ public class AttackView {
     JCheckBox checkBoxRawFireRating;
     checkBoxRawFireRating = new JCheckBox();
     checkBoxRawFireRating.setEnabled(true);
-    checkBoxRawFireRating.setText("0-9 Rating");
+    checkBoxRawFireRating.setSelected(true);
+    checkBoxRawFireRating.setText("0-9");
     checkBoxRawFireRating.addActionListener(e -> {
         myModel.setDisplayRealFireRating(!myModel.isDisplayRealFireRating());
         refresh();
@@ -184,7 +185,7 @@ public class AttackView {
     JCheckBox checkBoxAssaultFireRating;
     checkBoxAssaultFireRating = new JCheckBox();
     checkBoxAssaultFireRating.setEnabled(true);
-    checkBoxAssaultFireRating.setText("Assault Rating");
+    checkBoxAssaultFireRating.setText("Assault");
     checkBoxAssaultFireRating.addActionListener(e -> {
       myModel.setIsAssaultRating(!myModel.isAssaultRating());
       myModel.update();
@@ -192,7 +193,12 @@ public class AttackView {
       }
     );
 
-    ratingPanel.add(myWizard.getResolver().getControls());
+    ratingPanel.add(myWizard.getResolver().getControls(), "wrap");
+
+    final JPanel smallPanel = new JPanel(new MigLayout("ins 0", "[][]"));
+    // smallPanel.add(checkBoxRawFireRating); Hide Raw Assault rating box for now
+    smallPanel.add(checkBoxAssaultFireRating);
+    ratingPanel.add(smallPanel);
         
     topPanel.add(sourcePanel);
     topPanel.add(ratingPanel);
@@ -262,10 +268,7 @@ public class AttackView {
     botPanel.add(defencePanels[2], "w :190:");  
        
     mainPanel.add(botPanel, WIDTH+",wrap");
-    mainPanel.add(checkBoxRawFireRating, "wrap");
-    mainPanel.add(checkBoxAssaultFireRating, "wrap");
-
-  }  
+  }
   
   
   protected void buildModePanels(int mode) {
