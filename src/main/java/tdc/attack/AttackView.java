@@ -35,7 +35,7 @@ import java.awt.*;
 public class AttackView {
   protected static Font boldFont;
   protected static Font normalFont;
-  protected static String WIDTH = "w 430:430";
+  protected static String WIDTH = "w 450:450";
   
   protected AttackModel myModel;
   protected JPanel mainPanel;
@@ -192,6 +192,7 @@ public class AttackView {
 
     checkBoxAssaultFireRating.setEnabled(true);
     checkBoxAssaultFireRating.setSelected(false);
+    myModel.setIsAssaultRating(false);
     checkBoxAssaultFireRating.setText("Use Assault Rating?");
     checkBoxAssaultFireRating.addActionListener(e -> {
       myModel.setIsAssaultRating(checkBoxAssaultFireRating.isSelected());
@@ -201,13 +202,22 @@ public class AttackView {
     );
 
     defendingAssault = new JCheckBox("Defending Assault?");
+    defendingAssault.setSelected(false);
+    defendingAssault.addActionListener( e -> {
+      myModel.setDefendingAssault(defendingAssault.isSelected());
+      myModel.update();
+      refresh();
+    });
 
     ratingPanel.add(myWizard.getResolver().getControls(), "wrap");
 
     final JPanel smallPanel = new JPanel(new MigLayout("ins 0, hidemode 3", "[]"));
     // smallPanel.add(checkBoxRawFireRating); Hide Raw Assault rating box for now
     smallPanel.add(checkBoxAssaultFireRating, "wrap");
-    smallPanel.add(defendingAssault);
+    // GTS2 Rules require different handling of terrain mods for Assaulting units as opposed to defending units
+    if (UnitInfo.isGTS2Rules()) {
+      smallPanel.add(defendingAssault);
+    }
     ratingPanel.add(smallPanel);
         
     topPanel.add(sourcePanel);
@@ -268,18 +278,22 @@ public class AttackView {
     l.setFont(boldFont);
     botPanel.add(l, "align center, wrap");
     
-    botPanel.add(attackPanels[0], "w :190:");
-    botPanel.add(attackPanels[1], "w :190:");
-    botPanel.add(attackPanels[2], "w :190:");
-    botPanel.add(attackPanels[3], "w :190:");
+    botPanel.add(attackPanels[0], "w :200:");
+    botPanel.add(attackPanels[1], "w :200:");
+    botPanel.add(attackPanels[2], "w :200:");
+    botPanel.add(attackPanels[3], "w :200:");
     
     
-    botPanel.add(defencePanels[0], "w :190:");
-    botPanel.add(defencePanels[1], "w :190:");
-    botPanel.add(defencePanels[2], "w :190:");
-    botPanel.add(defencePanels[3], "w :190:");
+    botPanel.add(defencePanels[0], "w :200:");
+    botPanel.add(defencePanels[1], "w :200:");
+    botPanel.add(defencePanels[2], "w :200:");
+    botPanel.add(defencePanels[3], "w :200:");
 
     mainPanel.add(botPanel, WIDTH+",wrap");
+
+    myModel.setDefendingAssault(defendingAssault.isSelected());
+    myModel.update();
+    refresh();
   }
   
   

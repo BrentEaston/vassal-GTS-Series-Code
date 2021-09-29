@@ -918,7 +918,7 @@ public class UnitInfo {
   }
 
   public GamePiece getArtilleryParkPiece () {
-    if (inArtilleryPark==false) {
+    if (!inArtilleryPark) {
       return null;
     }
     String artilleryParkId = (String) unit.getProperty(BasicPiece.LOCATION_NAME);
@@ -953,7 +953,7 @@ public class UnitInfo {
   }
 
   protected void addDefenceModifier(String desc, int val, boolean assaultDefenceOnly) {
-    addDefenceModifier(desc, val, null, true, true, true, true, true);
+    addDefenceModifier(desc, val, null, true, true, true, true, assaultDefenceOnly);
   }
 
   protected void addDefenceModifier(String desc, int val) {
@@ -965,7 +965,7 @@ public class UnitInfo {
   }
 
   protected void addDefenceModifier(String desc, int val, boolean dir, boolean ind, boolean opp, boolean assault) {
-    addDefenceModifier(desc, val, null, dir, ind, opp);
+    addDefenceModifier(desc, val, null, dir, ind, opp, assault);
   }
 
   protected void addDefenceModifier(String desc, int val, GamePiece owner) {
@@ -978,6 +978,10 @@ public class UnitInfo {
       f.setAssaultDefenceOnly(assaultDefenceOnly);
       defenceModifiers.add(f);
     }
+  }
+
+  protected void addDefenceModifier(String desc, int val, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultDefenceOnly) {
+    addDefenceModifier(desc, val, null, dir, ind, opp, assault, assaultDefenceOnly);
   }
 
   protected void addDefenceModifier(String desc, int val, GamePiece owner, boolean dir, boolean ind, boolean opp, boolean asslt, boolean assaultDefenceOnly){
@@ -1059,7 +1063,7 @@ public class UnitInfo {
     if ("true".equals(hill) & !column) {
       final int modifier = isArmoured() ? -2 : -1;
       adjustSpecialDefence("Hill", modifier);
-      addDefenceModifier("Hill", modifier, true, false, true, true);
+      addDefenceModifier("Hill", modifier, true, false, true, true, true);
     }
   }
 

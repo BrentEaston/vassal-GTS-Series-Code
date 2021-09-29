@@ -1038,14 +1038,14 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
               }
             }
           }
-          if (reportAddBarrage==true) {
-            if (reportHeavyBarrage==true) {
+          if (reportAddBarrage) {
+            if (reportHeavyBarrage) {
               text.add("*** Placed Heavy Barrage ***");
             } else  {
               text.add("*** Placed Light Barrage ***");
             }
           } else {
-            if (reportHeavyBarrage==true) {
+            if (reportHeavyBarrage) {
               text.add("*** Flipped existing Barrage to Heavy ***");
             }
           }
@@ -1066,7 +1066,7 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
       }
     }
 
-    if (this.sourceInfo.inArtilleryPark==true) {
+    if (this.sourceInfo.inArtilleryPark) {
       // Fire originated from an Artillery Park
       // Locate the park piece and trigger "fired".
       // Get "Fired" layer (Embellishment)

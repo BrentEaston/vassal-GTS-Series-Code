@@ -59,7 +59,7 @@ public class FireModifier {
   protected AttackModel listener;
   protected GamePiece owner;
   protected String id;
-  protected boolean doNotDisplay;
+  protected boolean[] doNotDisplay;
   protected String bonusMessage = null;
   protected boolean assaultDefenceOnly;
 
@@ -92,7 +92,9 @@ public class FireModifier {
 
   public FireModifier(String description, int value, boolean doNotDisplay) {
     this(description, value);
-    this.doNotDisplay = doNotDisplay;
+    for (int i = 0; i < AttackModel.MODES.length; i++) {
+      this.doNotDisplay[i] = doNotDisplay;
+    }
   }
   
   public FireModifier(String description, int value, GamePiece owner) {
@@ -100,20 +102,8 @@ public class FireModifier {
     this.owner = owner;
   }
 
-  public FireModifier(String description, int value, boolean dir, boolean ind, boolean opp) {
-    this(description, value, BASIC, dir, ind, opp, null);
-  }
-
   public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault) {
     this(description, value, type, dir, ind, opp, assault, null);
-  }
-
-  public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp) {
-    this(description, value, type, dir, ind, opp, null);
-  }
-
-  public FireModifier(String description, int value, GamePiece owner, boolean dir, boolean ind, boolean opp) {
-    this(description, value, owner, dir, ind, opp, false);
   }
 
   public FireModifier(String description, int value, GamePiece owner, boolean dir, boolean ind, boolean opp, boolean assault) {
@@ -149,7 +139,9 @@ public class FireModifier {
     controls = new JPanel[AttackModel.MODES.length];
     labels = new JLabel[AttackModel.MODES.length];
     checkBoxes = new JCheckBox[AttackModel.MODES.length];
-    
+
+    doNotDisplay = new boolean[AttackModel.MODES.length];
+
     id = Integer.toString(getCrossRef().size());
     crossRef.put(id, this);
   }
@@ -323,12 +315,23 @@ public class FireModifier {
         controls[mode].add(plusButton);
       }
     }
-    if (doNotDisplay) {
-      controls[mode].setVisible(!doNotDisplay);
-    }
+
+    controls[mode].setVisible(!doNotDisplay[mode]);
+
     return controls[mode];
   }
-  
+
+  public void setDoNotDisplay(int mode, boolean display) {
+    doNotDisplay[mode] = display;
+    if (controls[mode] != null) {
+      controls[mode].setVisible(!display);
+    }
+  }
+
+  public boolean isDoNotDisplay(int mode) {
+    return controls != null && controls[mode] != null && !controls[mode].isVisible();
+  }
+
   protected void rollCompanyBonus() {
     final int roll = (int) (GameModule.getGameModule().getRNG().nextFloat() * 10);
     final UnitInfo info = listener.getSourceInfo();
