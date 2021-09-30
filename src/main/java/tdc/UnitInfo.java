@@ -918,7 +918,7 @@ public class UnitInfo {
   }
 
   public GamePiece getArtilleryParkPiece () {
-    if (inArtilleryPark==false) {
+    if (!inArtilleryPark) {
       return null;
     }
     String artilleryParkId = (String) unit.getProperty(BasicPiece.LOCATION_NAME);
@@ -952,22 +952,52 @@ public class UnitInfo {
     }
   }
 
+  protected void addDefenceModifier(String desc, int val, boolean assaultDefenceOnly) {
+    addDefenceModifier(desc, val, null, true, true, true, true, assaultDefenceOnly);
+  }
+
   protected void addDefenceModifier(String desc, int val) {
     addDefenceModifier(desc, val, null);
   }
 
   protected void addDefenceModifier(String desc, int val, boolean dir, boolean ind, boolean opp) {
-    addDefenceModifier(desc, val, null, dir, ind, opp);
+    addDefenceModifier(desc, val, dir, ind, opp, false);
+  }
+
+  protected void addDefenceModifier(String desc, int val, boolean dir, boolean ind, boolean opp, boolean assault) {
+    addDefenceModifier(desc, val, null, dir, ind, opp, assault);
   }
 
   protected void addDefenceModifier(String desc, int val, GamePiece owner) {
     addDefenceModifier(desc, val, owner, true, true, true);
   }
 
-  protected void addDefenceModifier(String desc, int val, GamePiece owner, boolean dir, boolean ind, boolean opp) {
+  protected void addDefenceModifier(String desc, int val, GamePiece owner, boolean assaultDefenceOnly) {
     if (isAttacking()) {
-      defenceModifiers.add(new FireModifier(desc, val, owner, dir, ind, opp));
+      final FireModifier f = new FireModifier(desc, val, owner, true, true, true, true);
+      f.setAssaultDefenceOnly(assaultDefenceOnly);
+      defenceModifiers.add(f);
     }
+  }
+
+  protected void addDefenceModifier(String desc, int val, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultDefenceOnly) {
+    addDefenceModifier(desc, val, null, dir, ind, opp, assault, assaultDefenceOnly);
+  }
+
+  protected void addDefenceModifier(String desc, int val, GamePiece owner, boolean dir, boolean ind, boolean opp, boolean asslt, boolean assaultDefenceOnly){
+    if (isAttacking()) {
+      final FireModifier f = new FireModifier(desc, val, owner, dir, ind, opp, asslt);
+      f.setAssaultDefenceOnly(assaultDefenceOnly);
+      defenceModifiers.add(f);
+    }
+  }
+
+  protected void addDefenceModifier(String desc, int val, GamePiece owner, boolean dir, boolean ind, boolean opp) {
+    addDefenceModifier(desc, val, owner, dir, ind, opp, true);
+  }
+
+  protected void addDefenceModifier(String desc, int val, GamePiece owner, boolean dir, boolean ind, boolean opp, boolean asslt) {
+    addDefenceModifier(desc, val, owner, dir, ind, opp, asslt, false);
   }
 
   public ArrayList<FireModifier> getAttackModifiers() {
@@ -1015,25 +1045,25 @@ public class UnitInfo {
 
     if (raised) {
       adjustSpecialDefence("Raised Road/RR", 2);
-      addDefenceModifier("Raised Road/RR", 2);
+      addDefenceModifier("Raised Road/RR", 2, true);
     }
 
     if (embanked) {
       adjustSpecialDefence("Embankment Road/RR", 2);
-      addDefenceModifier("Embankment Road/RR", 2);
+      addDefenceModifier("Embankment Road/RR", 2, true);
     }
 
     if (sunken) {
       final int modifier = isVehicle() ? -3 : -2;
       adjustSpecialDefence("Sunken Road/RR", modifier);
-      addDefenceModifier("Sunken Road/RR", modifier);
+      addDefenceModifier("Sunken Road/RR", modifier, true);
     }
 
     final String hill = (String) TdcMap.getTerrainProperty(unit, TdcProperties.HILL);
     if ("true".equals(hill) & !column) {
       final int modifier = isArmoured() ? -2 : -1;
       adjustSpecialDefence("Hill", modifier);
-      addDefenceModifier("Hill", modifier, true, false, true);
+      addDefenceModifier("Hill", modifier, true, false, true, true, true);
     }
   }
 
@@ -1328,7 +1358,7 @@ public class UnitInfo {
             addAttackModifier("Entrenched", 1);
             adjustAssaultRating("Entrenched", 1);
             adjustDefenceRating("Entrenched", -2);
-            addDefenceModifier("Entrenched", -2, unit, true, true, false);
+            addDefenceModifier("Entrenched", -2, unit, true, true, false, true, true);
             adjustTqrRating("Entrenched", 2);
           }
         }
@@ -1395,14 +1425,14 @@ public class UnitInfo {
               addAttackModifier("Entrenched", 1);
               adjustAssaultRating("Entrenched", 1);
               adjustDefenceRating("Entrenched", -2);
-              addDefenceModifier("Entrenched", -2, unit, true, true, false);
+              addDefenceModifier("Entrenched", -2, unit, true, true, false, true, true);
               adjustTqrRating("Entrenched", 2);
 
             }
             else {
               ip = true;
               adjustDefenceRating("IP", -1);
-              addDefenceModifier("IP", -1, unit);
+              addDefenceModifier("IP", -1, unit, true);
               adjustTqrRating("IP", 1);
             }
           }
@@ -1434,7 +1464,7 @@ public class UnitInfo {
           adjustAssaultRating("In Bocage", 1);
           adjustTqrRating("In Bocage", 1);
           adjustDefenceRating("In Bocage", -1);
-          addDefenceModifier("In Bocage", -1, unit);
+          addDefenceModifier("In Bocage", -1, unit, true);
           setMoveRating("In Bocage", "No");
         }
 

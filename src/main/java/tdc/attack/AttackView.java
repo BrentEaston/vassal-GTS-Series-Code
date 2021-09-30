@@ -35,7 +35,7 @@ import java.awt.*;
 public class AttackView {
   protected static Font boldFont;
   protected static Font normalFont;
-  protected static String WIDTH = "w 430:430";
+  protected static String WIDTH = "w 450:450";
   
   protected AttackModel myModel;
   protected JPanel mainPanel;
@@ -49,6 +49,8 @@ public class AttackView {
   protected Color unselectedColor;
   protected AttackWizard myWizard;
   protected JPanel specialAttack = new JPanel();
+  protected JCheckBox checkBoxAssaultFireRating = new JCheckBox();
+  protected JCheckBox defendingAssault = new JCheckBox();
 
   public AttackView(AttackModel model, AttackWizard owner) {
     myModel = model;
@@ -113,6 +115,8 @@ public class AttackView {
       rating.refresh();
     }
     specialAttack.setVisible(myModel.canCounterBatteryFire() || myModel.isAirPower() || myModel.isPartisanAttack());
+    checkBoxAssaultFireRating.setVisible(myModel.isAssaultMode());
+    defendingAssault.setVisible(myModel.isAssaultMode());
   }
   
   protected void pack() {
@@ -122,11 +126,12 @@ public class AttackView {
   protected void buildContent() {
 
     mainPanel = new JPanel(new MigLayout("insets 0,hidemode 3"));
+    final JPanel buttonPanel = new JPanel(new MigLayout("ins 0,hidemode 3", "[center]rel[center]rel[center]rel[center]"));
     final JPanel topPanel = new JPanel(new MigLayout("hidemode 3", "[center]push[center]push[center]", "[top]"));
     final JPanel botPanel = new JPanel(new MigLayout("hidemode 3", "[left]push[right]", "[top]"));
     
-    modeButtons = new JButton[3];
-    for (int i = 0; i < 3; i++) {
+    modeButtons = new JButton[AttackModel.MODES.length];
+    for (int i = 0; i < AttackModel.MODES.length; i++) {
       final int mode = i;
       final JButton button = new JButton(AttackModel.MODES[i]);
       button.addActionListener(e -> {
@@ -159,9 +164,11 @@ public class AttackView {
       topPanel.add(heading, "span 3,wrap");
     }
     else {
-     topPanel.add(modeButtons[0]);
-     topPanel.add(modeButtons[1]);
-     topPanel.add(modeButtons[2], "wrap");
+      buttonPanel.add(modeButtons[0], "sg 1");
+      buttonPanel.add(modeButtons[1], "sg 1");
+      buttonPanel.add(modeButtons[2], "sg 1");
+      buttonPanel.add(modeButtons[3], "sg 1, wrap");
+      topPanel.add(buttonPanel, "span 3, center, wrap");
     }
 
     
@@ -171,8 +178,8 @@ public class AttackView {
     rating = new RatingDisplay(myModel);
     final JPanel ratingPanel = rating.getContent();
 
-    JCheckBox checkBoxRawFireRating;
-    checkBoxRawFireRating = new JCheckBox();
+    // Fo future expansion if we want to make the 0-9 limit option visible
+    final JCheckBox checkBoxRawFireRating = new JCheckBox();
     checkBoxRawFireRating.setEnabled(true);
     checkBoxRawFireRating.setSelected(true);
     checkBoxRawFireRating.setText("0-9");
@@ -182,22 +189,35 @@ public class AttackView {
       }
     );
 
-    JCheckBox checkBoxAssaultFireRating;
-    checkBoxAssaultFireRating = new JCheckBox();
+
     checkBoxAssaultFireRating.setEnabled(true);
-    checkBoxAssaultFireRating.setText("Assault");
+    checkBoxAssaultFireRating.setSelected(false);
+    myModel.setIsAssaultRating(false);
+    checkBoxAssaultFireRating.setText("Use Assault Rating?");
     checkBoxAssaultFireRating.addActionListener(e -> {
-      myModel.setIsAssaultRating(!myModel.isAssaultRating());
+      myModel.setIsAssaultRating(checkBoxAssaultFireRating.isSelected());
       myModel.update();
       refresh();
       }
     );
 
+    defendingAssault = new JCheckBox("Defending Assault?");
+    defendingAssault.setSelected(false);
+    defendingAssault.addActionListener( e -> {
+      myModel.setDefendingAssault(defendingAssault.isSelected());
+      myModel.update();
+      refresh();
+    });
+
     ratingPanel.add(myWizard.getResolver().getControls(), "wrap");
 
-    final JPanel smallPanel = new JPanel(new MigLayout("ins 0", "[][]"));
+    final JPanel smallPanel = new JPanel(new MigLayout("ins 0, hidemode 3", "[]"));
     // smallPanel.add(checkBoxRawFireRating); Hide Raw Assault rating box for now
-    smallPanel.add(checkBoxAssaultFireRating);
+    smallPanel.add(checkBoxAssaultFireRating, "wrap");
+    // GTS2 Rules require different handling of terrain mods for Assaulting units as opposed to defending units
+    if (UnitInfo.isGTS2Rules()) {
+      smallPanel.add(defendingAssault);
+    }
     ratingPanel.add(smallPanel);
         
     topPanel.add(sourcePanel);
@@ -243,10 +263,10 @@ public class AttackView {
       mainPanel.add(specialAttack,WIDTH+",wrap");
     }
     
-    attackPanels = new JPanel[3];
-    defencePanels = new JPanel[3];
+    attackPanels = new JPanel[AttackModel.MODES.length];
+    defencePanels = new JPanel[AttackModel.MODES.length];
     
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < AttackModel.MODES.length; i++) {
       buildModePanels(i);
     }
     
@@ -258,16 +278,22 @@ public class AttackView {
     l.setFont(boldFont);
     botPanel.add(l, "align center, wrap");
     
-    botPanel.add(attackPanels[0], "w :190:");
-    botPanel.add(attackPanels[1], "w :190:");
-    botPanel.add(attackPanels[2], "w :190:");
+    botPanel.add(attackPanels[0], "w :200:");
+    botPanel.add(attackPanels[1], "w :200:");
+    botPanel.add(attackPanels[2], "w :200:");
+    botPanel.add(attackPanels[3], "w :200:");
     
     
-    botPanel.add(defencePanels[0], "w :190:");
-    botPanel.add(defencePanels[1], "w :190:");
-    botPanel.add(defencePanels[2], "w :190:");  
-       
+    botPanel.add(defencePanels[0], "w :200:");
+    botPanel.add(defencePanels[1], "w :200:");
+    botPanel.add(defencePanels[2], "w :200:");
+    botPanel.add(defencePanels[3], "w :200:");
+
     mainPanel.add(botPanel, WIDTH+",wrap");
+
+    myModel.setDefendingAssault(defendingAssault.isSelected());
+    myModel.update();
+    refresh();
   }
   
   
@@ -294,7 +320,7 @@ public class AttackView {
   }
   
   public void changeMode(int mode) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < AttackModel.MODES.length; i++) {
       modeButtons[i].setBackground(mode == i ? selectedColor : unselectedColor);      
       modeButtons[i].setFont(i == mode ? boldFont : normalFont);     
       attackPanels[i].setVisible(i == mode);
