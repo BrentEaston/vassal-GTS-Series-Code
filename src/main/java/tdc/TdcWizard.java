@@ -193,7 +193,7 @@ public class TdcWizard extends Decorator implements EditablePiece {
       keyCommands.add(infoCommand);
       
       assaultCommand = new KeyCommand(ASSAULT_COMMAND, assaultKey, Decorator.getOutermost(this));
-      assaultCommand.setEnabled(getMap() != null && getMap() instanceof TdcMap && info.canAssault());
+      assaultCommand.setEnabled(getMap() != null && getMap() instanceof TdcMap && info.canAssault(false));
      //  keyCommands.add(assaultCommand);
     }
 

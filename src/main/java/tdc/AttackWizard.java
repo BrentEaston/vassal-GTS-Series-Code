@@ -998,7 +998,7 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
             text.add("*HIT*, Result = Fighter Bomber aborts mission!");
           }
           else {
-            text.add("*HIT*, Result = " + FireResolver.resolve(myModel.getFireRatingColour(), (myModel.isTargetArmoured() || myModel.isTargetEntrenched()), roll));
+            text.add("*HIT*, Result = " + FireResolver.resolve(myModel.getFireRatingColour(), (myModel.isTargetArmoured() || myModel.isTargetEntrenched() || myModel.isTargetRubbled()), roll));
           }
         }
         // Place barrage if not 9 and indirect, unless one is already there

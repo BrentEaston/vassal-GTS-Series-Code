@@ -94,7 +94,12 @@ public class FireModifier {
     this(description, value);
     this.doNotDisplay = doNotDisplay;
   }
-  
+
+  public FireModifier(String description, int value, GamePiece owner, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultdef, boolean doNotDisplay) {
+    this(description, value, BASIC, dir, ind, opp, assault, assaultdef, null, owner );
+    this.doNotDisplay = doNotDisplay;
+  }
+
   public FireModifier(String description, int value, GamePiece owner) {
     this(description, value, BASIC, true, true, true, true);
     this.owner = owner;
@@ -126,7 +131,11 @@ public class FireModifier {
   }
 
   public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault, AttackModel model, GamePiece owner) {
-    this(description, value, type, dir, ind, opp, assault, model);
+    this(description, value, type, dir, ind, opp, assault, false, model, owner);
+  }
+
+  public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultdef, AttackModel model, GamePiece owner) {
+    this(description, value, type, dir, ind, opp, assault, assaultdef, model);
     this.owner = owner;
   }
   
@@ -135,6 +144,10 @@ public class FireModifier {
   }
 
   public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault, AttackModel model) {
+    this(description, value, type, dir, ind, opp, assault, false, model);
+  }
+
+  public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultdef, AttackModel model) {
     this.description = description;
     this.modifier = value;
     this.type = type;
@@ -146,6 +159,7 @@ public class FireModifier {
     modes[AttackModel.MODE_INDIRECT] = ind;
     modes[AttackModel.MODE_OPPORTUNITY] = opp;
     modes[AttackModel.MODE_ASSAULT] = assault;
+    modes[AttackModel.MODE_ASSAULT_DEF] = assaultdef;
     controls = new JPanel[AttackModel.MODES.length];
     labels = new JLabel[AttackModel.MODES.length];
     checkBoxes = new JCheckBox[AttackModel.MODES.length];

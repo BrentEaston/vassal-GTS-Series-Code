@@ -40,7 +40,8 @@ public class AttackModel {
   public static final int MODE_INDIRECT = 1;
   public static final int MODE_OPPORTUNITY = 2;
   public static final int MODE_ASSAULT = 3;
-  public static final String[] MODES = new String[] { "Direct", "Indirect", "Opportunity", "Assault" };
+  public static final int MODE_ASSAULT_DEF = 4;
+  public static final String[] MODES = new String[] { "Direct", "Indirect", "Opportunity", "Assault", "Assault Def" };
   public static final String FZ_TO_FZ = "Target moving FZ to FZ";
   public static final String FZ_TO_NON_FZ = "Target moving FZ to Non-FZ";
   public static final String COUNTER_BATTERY_FIRE = "Counter-Battery Fire";
@@ -235,6 +236,10 @@ public class AttackModel {
     return targetInfo.isArmoured();
   }
 
+  public boolean isTargetEntrenched() {
+    return targetInfo.isRubbled();
+  }
+
   public boolean isIndirectFire() {
     final String fc = sourceInfo.getFireColor();
     if ( TdcRatings.ORANGE.equals(fc) || TdcRatings.BLACK.equals(fc) || TdcRatings.BROWN.equals(fc) ) {
@@ -285,8 +290,8 @@ public class AttackModel {
     return false;
   }
 
-  public boolean isTargetEntrenched() {
-    return targetInfo.isEntrenched();
+  public boolean isTargetRubbled() {
+    return targetInfo.isRubbled();
   }
 
   public boolean canCounterBatteryFire() {
@@ -497,7 +502,7 @@ public class AttackModel {
   }
 
   public boolean isAssaultMode() {
-    return getMode() == MODE_ASSAULT;
+    return getMode() >= MODE_ASSAULT;
   }
 
   public String getModeString() {
@@ -547,7 +552,8 @@ public class AttackModel {
       return;
     }
 
-    modeEnabled[MODE_ASSAULT] = sourceInfo.canAssault() && getRange() == 1;
+    modeEnabled[MODE_ASSAULT] = sourceInfo.canAssault(true) && getRange() == 1;
+
 
     if (sourceInfo.isMortar()) {
       mode = MODE_INDIRECT;
@@ -808,7 +814,7 @@ public class AttackModel {
         if (sourceInfo.getCoHits() == 2) {
           addAttackModifier(new FireModifier("Cohesion Hit x 2", +2, FireModifier.BASIC, true, false, false, this));
         }
-        addAttackModifier(new FireModifier("Other", 0, FireModifier.COUNT, true, true, true, this));
+        addAttackModifier(new FireModifier("Other", 0, FireModifier.COUNT, true, true, true, true, true, this));
         return attackModifiers;
       }
 
@@ -817,7 +823,7 @@ public class AttackModel {
       }
 
       if (sourceInfo.getSteps() == 2) {
-        addAttackModifier(new FireModifier("Company Bonus", 2, FireModifier.BONUS, true, true, false, true, this));
+        addAttackModifier(new FireModifier("Company Bonus", 2, FireModifier.BONUS, true, true, false, true, true, this));
       }
       if (canCounterBatteryFire) {
         addAttackModifier(new FireModifier(COUNTER_BATTERY_FIRE, -2, FireModifier.ONOFF, false, true, false, this));
@@ -825,11 +831,11 @@ public class AttackModel {
       if (isNight) {
         if (TdcProperties.DIVISION_6AB.equals(division) || TdcProperties.DIVISION_12SS.equals(division)
           || TdcProperties.DIVISION_82AB.equals(division) || TdcProperties.DIVISION_101AB.equals(division)) {
-          addAttackModifier(new FireModifier(division + " Night bonus", 3, FireModifier.ONOFF, true, true, true, true, this));
+          addAttackModifier(new FireModifier(division + " Night bonus", 3, FireModifier.ONOFF, false, false, false, true, false, this));
         }
       }
 
-      addAttackModifier(new FireModifier("Other", 0, FireModifier.COUNT, true, true, true, true, this));
+      addAttackModifier(new FireModifier("Other", 0, FireModifier.COUNT, true, true, true, true, true, this));
     }
     return attackModifiers;
   }
@@ -837,7 +843,8 @@ public class AttackModel {
   protected ArrayList<FireModifier> getDefenceModifiers() {
     if (defenceModifiers == null) {
       defenceModifiers = new ArrayList<>();
-
+    }
+    defenceModifiers.clear();
       if (isBeachDefenceAttack() || isSeaStateAttack() | isObstaclesAttack() || isAirDefence()) {
         return defenceModifiers;
       }
@@ -965,17 +972,17 @@ public class AttackModel {
           }
         }
         if (massBonus != 0) {
-          addDefenceModifier(new FireModifier("Mass " + massDesc + " steps", massBonus, FireModifier.BASIC, true, true, true, this, targets.get(i)));
+          addDefenceModifier(new FireModifier("Mass " + massDesc + " steps", massBonus, FireModifier.BASIC, true, true, true, true, true, this, targets.get(i)));
         }
         // Yucko, but need to do this to keep the order the same now that non-adj Ridge option
         // if (i == targets.size()-1) {
-        defenceModifier = new FireModifier(BASE_DEFENCE_RATING, targetInfos.get(i).getDefenceRating(), FireModifier.BASIC, true, true, true, this, targets.get(i));
+        defenceModifier = new FireModifier(BASE_DEFENCE_RATING, targetInfos.get(i).getDefenceRating(), FireModifier.BASIC, true, true, true, true, true, this, targets.get(i));
         addDefenceModifier(defenceModifier);
 
         //}
 
         if (!isSpecialAttack() && !isAirPower() && !info.isInColumn() && UnitInfo.isTgdRules()) {
-          final FireModifier f = new FireModifier("Target behind Ridge hexside", (targetInfos.get(i).isArmoured() ? -2 : -1), FireModifier.ONOFF, true, false, true, true, this, targets.get(i));
+          final FireModifier f = new FireModifier("Target behind Ridge hexside", (targetInfos.get(i).isArmoured() ? -2 : -1), FireModifier.ONOFF, true, false, true, true, true, this, targets.get(i));
           f.setAssaultDefenceOnly(true);
           addDefenceModifier(f);
         }
@@ -984,12 +991,14 @@ public class AttackModel {
       final int fz_to_fz_modifier = UnitInfo.isGTS2Rules() ? 2 : 3;
       addDefenceModifier(new FireModifier(FZ_TO_FZ, fz_to_fz_modifier, FireModifier.ONOFF, false, false, true, this));
       addDefenceModifier(new FireModifier(FZ_TO_NON_FZ, -1, FireModifier.ONOFF, false, false, true, this));
-      addDefenceModifier(new FireModifier("Running from Assault", 2, FireModifier.ONOFF, false, false, true, true, this));
-      final FireModifier f = new FireModifier("Charging Units", 2, FireModifier.ONOFF, false, false, false, true, this);
+      // Should not be added if Defending Assault checkbox is not selected
+      if ( defendingAssault ) {
+        addDefenceModifier(new FireModifier("Charging Units", 2, FireModifier.ONOFF, false, false, false, false, true, this));
+      }
+      final FireModifier f = new FireModifier("Running from Assault", 2, FireModifier.ONOFF, false, false, true, this);
       f.setAssaultDefenceOnly(true);
       addDefenceModifier(f);
 
-    }
     return defenceModifiers;
   }
 

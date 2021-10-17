@@ -120,7 +120,7 @@ public class AssaultModel {
   }
   
   public boolean canAssault(int i) {
-    return ! isSourceOverStacked() && sourceInfos.get(i).getInfo().canAssault();
+    return ! isSourceOverStacked() && sourceInfos.get(i).getInfo().canAssault(false);
   }
   
   public String getSourceAssaultReason(int i) {
@@ -172,7 +172,7 @@ public String getSecondaryAssaultRating (int i) {
     public AssaultInfo (GamePiece gp) {
       setPiece(gp);
       setInfo(new UnitInfo(gp, false));
-      setContinuing (info.canAssault());
+      setContinuing (info.canAssault(false));
       setBraveryRoll(info.getEffectiveTqr());
       findImage();
     }

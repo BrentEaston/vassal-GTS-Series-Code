@@ -309,22 +309,22 @@ public class UnitInfo {
   // Can this unit perform an Assault?
   // - Have Non-* MA
   // - Have non-blank Assault rating
-  // - Not be in Entrenchment or IP
+  // - Not be in Entrenchment (IP allowed, will be ignored)
   // - Not be suppressed
   // - Have at least one step
-  // - Not be under a Heavy barrage
+  // - Not be under a Heavy barrage (18.1)
   // - Not have a Green, Orange, Black or Brown fire rating
-  public boolean canAssault() {
-    checkAssault();
+  public boolean canAssault( boolean entOK) {
+    checkAssault(entOK);
     return assault;
   }
 
-  public String getAssaultReason() {
-    checkAssault();
+   public String getAssaultReason() {
+    checkAssault(false);
     return assaultReason;
   }
 
-  protected void checkAssault() {
+  protected void checkAssault( boolean entOk) {
 
     assault = false;
 
@@ -353,8 +353,9 @@ public class UnitInfo {
       return;
     }
 
-    if (isEntrenched() || isInIP()) {
-      assaultReason = "No, Entrenched or in IP";
+//    if (isEntrenched() || isInIP()) {
+    if (isEntrenched() && !entOk) {
+      assaultReason = "No, Entrenched";
       return;
     }
 
@@ -428,6 +429,9 @@ public class UnitInfo {
     return entrench;
   }
 
+  public boolean isRubbled() {
+    return rubbled;
+  }
   public boolean isInIP() {
     return ip;
   }
@@ -945,10 +949,19 @@ public class UnitInfo {
   protected void addAttackModifier(String desc, int val) {
     addAttackModifier(desc, val, false);
   }
+  protected void addAttackModifier(String desc, int val, GamePiece owner, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultdef) {
+    addAttackModifier(desc, val, owner, dir, ind, opp, assault, assaultdef, false);
+  }
+
 
   protected void addAttackModifier(String desc, int val, boolean doNotDisplay) {
     if (isAttacking()) {
       attackModifiers.add(new FireModifier(desc, val, doNotDisplay));
+    }
+  }
+  protected void addAttackModifier(String desc, int val, GamePiece owner, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultdef, boolean doNotDisplay) {
+    if (isAttacking()) {
+      attackModifiers.add(new FireModifier(desc, val, owner, dir, ind, opp, assault, assaultdef, doNotDisplay));
     }
   }
 
@@ -1351,7 +1364,7 @@ public class UnitInfo {
           if (!entrench && !ip) {
             entrench = true;
             adjustFireRating("Entrenched", 1);
-            addAttackModifier("Entrenched", 1);
+            addAttackModifier("Entrenched2", 1, unit, true, true, true, false, true);
             adjustAssaultRating("Entrenched", 1);
             adjustDefenceRating("Entrenched", -2);
             addDefenceModifier("Entrenched", -2, unit, true, true, false, true, true);
@@ -1411,14 +1424,14 @@ public class UnitInfo {
           setMoveRating("Air Landing Delay", "No");
         }
 
-        // IP/Entrenchement CCounter
+        // IP/Entrenchement Counter
         else if (TdcProperties.TYPE_IP.equals(type)) {
           if (!entrench && !ip) {
             final String ipLevel = (String) piece.getProperty("IP_Level");
             if ("2".equals(ipLevel)) {
               entrench = true;
               adjustFireRating("Entrenched", 1);
-              addAttackModifier("Entrenched", 1);
+              addAttackModifier("Entrenched2", 1, unit, true, true, true, false, true);
               adjustAssaultRating("Entrenched", 1);
               adjustDefenceRating("Entrenched", -2);
               addDefenceModifier("Entrenched", -2, unit, true, true, false, true, true);

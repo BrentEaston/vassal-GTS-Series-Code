@@ -50,7 +50,7 @@ public class AttackView {
   protected AttackWizard myWizard;
   protected JPanel specialAttack = new JPanel();
   protected JCheckBox checkBoxAssaultFireRating = new JCheckBox();
-  protected JCheckBox defendingAssault = new JCheckBox();
+  protected JCheckBox checkBoxDefendingAssault = new JCheckBox();
 
   public AttackView(AttackModel model, AttackWizard owner) {
     myModel = model;
@@ -116,7 +116,10 @@ public class AttackView {
     }
     specialAttack.setVisible(myModel.canCounterBatteryFire() || myModel.isAirPower() || myModel.isPartisanAttack());
     checkBoxAssaultFireRating.setVisible(myModel.isAssaultMode());
-    defendingAssault.setVisible(myModel.isAssaultMode());
+    checkBoxDefendingAssault.setVisible(myModel.isAssaultMode());
+
+    // Refresh the Attack and defense modifiers panels
+
   }
   
   protected void pack() {
@@ -136,7 +139,11 @@ public class AttackView {
       final JButton button = new JButton(AttackModel.MODES[i]);
       button.addActionListener(e -> {
         int oldMode = myModel.getMode();
-        changeMode(mode);
+        if (mode == 3 && myModel.isDefendingAssault()) {  //special treatment for the Assault button
+          changeMode(4);
+        } else {
+          changeMode(mode);
+        }
         myWizard.modeChanged(mode, oldMode);
       });
       button.setEnabled(myModel.isModeEnabled(i));
@@ -167,7 +174,7 @@ public class AttackView {
       buttonPanel.add(modeButtons[0], "sg 1");
       buttonPanel.add(modeButtons[1], "sg 1");
       buttonPanel.add(modeButtons[2], "sg 1");
-      buttonPanel.add(modeButtons[3], "sg 1, wrap");
+      buttonPanel.add(modeButtons[3], "sg 1 wrap");
       topPanel.add(buttonPanel, "span 3, center, wrap");
     }
 
@@ -195,19 +202,36 @@ public class AttackView {
     checkBoxAssaultFireRating.setText("Use Assault Rating?");
     checkBoxAssaultFireRating.addActionListener(e -> {
       myModel.setIsAssaultRating(checkBoxAssaultFireRating.isSelected());
-      myModel.update();
+        myModel.update();
       refresh();
       }
     );
 
-    defendingAssault = new JCheckBox("Defending Assault?");
+    checkBoxDefendingAssault = new JCheckBox("Defending Assault?");
+    checkBoxDefendingAssault.addActionListener(e -> {
+          myModel.setDefendingAssault(checkBoxDefendingAssault.isSelected());
+          int oldMode;
+          int mode;
+          if ( myModel.isDefendingAssault() ) {
+            oldMode = 3;
+            mode = 4;
+          } else {
+            oldMode = 4;
+            mode = 3;
+          }
+          changeMode(mode);
+          myModel.update();
+          refresh();
+          myWizard.modeChanged(mode, oldMode);
+        }
+    );
 
     ratingPanel.add(myWizard.getResolver().getControls(), "wrap");
 
     final JPanel smallPanel = new JPanel(new MigLayout("ins 0, hidemode 3", "[]"));
     // smallPanel.add(checkBoxRawFireRating); Hide Raw Assault rating box for now
     smallPanel.add(checkBoxAssaultFireRating, "wrap");
-    smallPanel.add(defendingAssault);
+    smallPanel.add(checkBoxDefendingAssault);
     ratingPanel.add(smallPanel);
         
     topPanel.add(sourcePanel);
@@ -272,19 +296,21 @@ public class AttackView {
     botPanel.add(attackPanels[1], "w :190:");
     botPanel.add(attackPanels[2], "w :190:");
     botPanel.add(attackPanels[3], "w :190:");
-    
+    botPanel.add(attackPanels[4], "w :190:");
+
     
     botPanel.add(defencePanels[0], "w :190:");
     botPanel.add(defencePanels[1], "w :190:");
     botPanel.add(defencePanels[2], "w :190:");
     botPanel.add(defencePanels[3], "w :190:");
+    botPanel.add(defencePanels[4], "w :190:");
 
     mainPanel.add(botPanel, WIDTH+",wrap");
   }
   
   
   protected void buildModePanels(int mode) {
-    attackPanels[mode] = new JPanel(new MigLayout("wrap 1, hidemode 3"));
+      attackPanels[mode] = new JPanel(new MigLayout("wrap 1, hidemode 3"));
     attackPanels[mode].setBorder(BorderFactory.createEtchedBorder());    
     
     defencePanels[mode] = new JPanel(new MigLayout("wrap 1, hidemode 3"));
