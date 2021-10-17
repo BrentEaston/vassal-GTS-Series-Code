@@ -61,7 +61,16 @@ public class FireModifier {
   protected String id;
   protected boolean doNotDisplay;
   protected String bonusMessage = null;
-  
+  protected boolean assaultDefenceOnly;
+
+  public boolean isAssaultDefenceOnly() {
+    return assaultDefenceOnly;
+  }
+
+  public void setAssaultDefenceOnly(boolean assaultDefenceOnly) {
+    this.assaultDefenceOnly = assaultDefenceOnly;
+  }
+
   protected static void initialiseCrossRef() {
     getCrossRef().clear();
   }
@@ -85,44 +94,75 @@ public class FireModifier {
     this(description, value);
     this.doNotDisplay = doNotDisplay;
   }
-  
+
+  public FireModifier(String description, int value, GamePiece owner, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultdef, boolean doNotDisplay) {
+    this(description, value, BASIC, dir, ind, opp, assault, assaultdef, null, owner );
+    this.doNotDisplay = doNotDisplay;
+  }
+
   public FireModifier(String description, int value, GamePiece owner) {
-    this(description, value, BASIC, true, true, true);
+    this(description, value, BASIC, true, true, true, true);
     this.owner = owner;
   }
 
   public FireModifier(String description, int value, boolean dir, boolean ind, boolean opp) {
     this(description, value, BASIC, dir, ind, opp, null);
   }
-  
+
+  public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault) {
+    this(description, value, type, dir, ind, opp, assault, null);
+  }
+
   public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp) {
-    this(description, value, BASIC, dir, ind, opp, null);
+    this(description, value, type, dir, ind, opp, null);
   }
 
   public FireModifier(String description, int value, GamePiece owner, boolean dir, boolean ind, boolean opp) {
-    this(description, value, BASIC, dir, ind, opp);
+    this(description, value, owner, dir, ind, opp, false);
+  }
+
+  public FireModifier(String description, int value, GamePiece owner, boolean dir, boolean ind, boolean opp, boolean assault) {
+    this(description, value, BASIC, dir, ind, opp, assault);
     this.owner = owner;
   }
   
   public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, AttackModel model, GamePiece owner) {
-    this(description, value, type, dir, ind, opp, model);
+    this(description, value, type, dir, ind, opp, false, model, owner);
+  }
+
+  public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault, AttackModel model, GamePiece owner) {
+    this(description, value, type, dir, ind, opp, assault, false, model, owner);
+  }
+
+  public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultdef, AttackModel model, GamePiece owner) {
+    this(description, value, type, dir, ind, opp, assault, assaultdef, model);
     this.owner = owner;
   }
   
   public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, AttackModel model) {
+    this(description, value, type, dir, ind, opp, false, model);
+  }
+
+  public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault, AttackModel model) {
+    this(description, value, type, dir, ind, opp, assault, false, model);
+  }
+
+  public FireModifier(String description, int value, int type, boolean dir, boolean ind, boolean opp, boolean assault, boolean assaultdef, AttackModel model) {
     this.description = description;
     this.modifier = value;
     this.type = type;
     this.value = type == BASIC ? value : 0;
     this.listener = model;
 
-    modes = new boolean[3];
+    modes = new boolean[AttackModel.MODES.length];
     modes[AttackModel.MODE_DIRECT] = dir;
     modes[AttackModel.MODE_INDIRECT] = ind;
     modes[AttackModel.MODE_OPPORTUNITY] = opp;
-    controls = new JPanel[3];
-    labels = new JLabel[3];
-    checkBoxes = new JCheckBox[3];
+    modes[AttackModel.MODE_ASSAULT] = assault;
+    modes[AttackModel.MODE_ASSAULT_DEF] = assaultdef;
+    controls = new JPanel[AttackModel.MODES.length];
+    labels = new JLabel[AttackModel.MODES.length];
+    checkBoxes = new JCheckBox[AttackModel.MODES.length];
     
     id = Integer.toString(getCrossRef().size());
     crossRef.put(id, this);
@@ -190,14 +230,14 @@ public class FireModifier {
     //modifier = v;
     value = v;
     if (type == ONOFF || type == BONUS) {
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < AttackModel.MODES.length; i++) {
         if (checkBoxes[i] != null) {
           checkBoxes[i].setSelected(value!=0);                
         }
       }
     }    
     refreshLabels();
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < AttackModel.MODES.length; i++) {
       if (controls[i] != null) {
         controls[i].repaint();
       }
@@ -217,7 +257,7 @@ public class FireModifier {
   }
   
   protected void updateLabels() {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < AttackModel.MODES.length; i++) {
       if (labels[i] != null) {
         labels[i].setText(getValueString());
       }
@@ -228,7 +268,7 @@ public class FireModifier {
   }
   
   protected void refreshLabels() {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < AttackModel.MODES.length; i++) {
       if (labels[i] != null) {
         labels[i].setText(getValueString());
       }
@@ -258,7 +298,7 @@ public class FireModifier {
           oldValue = value;
           value = value == 0 ? modifier : 0;
           updateLabels();
-          for (int i = 0; i < 3; i++) {
+          for (int i = 0; i < AttackModel.MODES.length; i++) {
             if (checkBoxes[i] != null) {
               checkBoxes[i].setSelected(value!=0);
             }
@@ -327,7 +367,7 @@ public class FireModifier {
     }
  
     updateLabels();
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < AttackModel.MODES.length; i++) {
       if (checkBoxes[i] != null) {
         checkBoxes[i].setSelected(value!=0);                
       }
