@@ -644,6 +644,9 @@ public class TerrainHexGridEditor extends GridEditor implements ActionListener, 
 
     tabPane.addChangeListener(e -> setMode(tabPane.getTitleAt(tabPane.getSelectedIndex())));
 
+    // Turn off grid caching
+    board.setCacheGrid(false);
+
     scroll.revalidate();
     pack();
     repaint();
