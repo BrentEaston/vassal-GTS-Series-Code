@@ -19,13 +19,18 @@
 
 package tdc;
 
+import static VASSAL.configure.ComponentLayout.DEFAULT_COMPONENT_COLUMN_CONSTRAINTS;
+import static VASSAL.configure.ComponentLayout.DEFAULT_COMPONENT_LAYOUT_CONSTRAINTS;
+
+import VASSAL.configure.ComponentConfigPanel;
+import VASSAL.counters.TraitLayout;
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.InputEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
@@ -41,6 +46,7 @@ import VASSAL.counters.GamePiece;
 import VASSAL.counters.GlobalCommand;
 import VASSAL.counters.PieceFilter;
 import VASSAL.tools.RecursionLimiter.Loopable;
+import net.miginfocom.swing.MigLayout;
 
 public class TdcScenarioOptions extends Widget {
 
@@ -89,147 +95,117 @@ public class TdcScenarioOptions extends Widget {
 
     if (panel == null) {
 
-      panel = new JPanel();
-      panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+      panel = new JPanel(new BorderLayout());
 
-      final Box optionBox = Box.createVerticalBox();
+      final JPanel optionBox = new JPanel(new MigLayout("wrap 1", "[fill]", "[][][][][]push"));
       optionBox.setBorder(BorderFactory.createEtchedBorder());
-      optionBox.add(new JLabel("Scenario Options"));
-      optionBox.add(new JLabel(" "));
+      optionBox.add(new BoldLabel("Scenario Options"), "growx,pushx");
 
-      final Box generalBox = Box.createVerticalBox();
-      generalBox.setBorder(BorderFactory.createEtchedBorder());
+      final ComponentPanel generalBox = new ComponentPanel();
 
-      generalBox.add(new JLabel(" "));
-      generalBox.add(new JLabel("General"));
-      generalBox.add(new JLabel(" "));
+      generalBox.addHeading("General");
 
       aicAllied = new BooleanOption("AIC-Allied", "Allied units always in command");
-      generalBox.add(aicAllied.getControls());
+      generalBox.add(aicAllied);
 
       aicGerman = new BooleanOption("AIC-German", "Axis units always in command");
-      generalBox.add(aicGerman.getControls());
+      generalBox.add(aicGerman);
 
-      generalBox.add(new JLabel(" "));
-      
-      optionBox.add(generalBox);
-      optionBox.add(new JLabel(" "));
+      optionBox.add(generalBox, "growx,push");
 
       if (UnitInfo.isCreteRules()) {
         
-        final Box creteBox = Box.createVerticalBox();
-        creteBox.setBorder(BorderFactory.createEtchedBorder());
+        final ComponentPanel creteBox = new ComponentPanel();
 
-        creteBox.add(new JLabel(" "));
-        creteBox.add(new JLabel("Crete"));
-        creteBox.add(new JLabel(" "));
-        
+        creteBox.addHeading("Crete");
+
         creteDiv2nz = new BooleanOption("Used-2nz", "2nd NZ division card used in scenario");
-        creteBox.add(creteDiv2nz.getControls());
+        creteBox.add(creteDiv2nz);
 
         creteDivcrefor = new BooleanOption("Used-crefor", "CREFOR division card used in scenario");
-        creteBox.add(creteDivcrefor.getControls());
+        creteBox.add(creteDivcrefor);
         
         creteDiv14th = new BooleanOption("Used-14th", "14th Brigade division card used in scenario");
-        creteBox.add(creteDiv14th.getControls());
+        creteBox.add(creteDiv14th);
         
         creteDiv19th = new BooleanOption("Used-19th", "19th Brigade division card used in scenario");
-        creteBox.add(creteDiv19th.getControls());
+        creteBox.add(creteDiv19th);
 
         creteDiv5geb = new BooleanOption("Used-5geb", "5th Gebirgs division card used in scenario");
-        creteBox.add(creteDiv5geb.getControls());
+        creteBox.add(creteDiv5geb);
         
         creteDiv7fl = new BooleanOption("Used-7fl", "7th Flieger division card used in scenario");
-        creteBox.add(creteDiv7fl.getControls());
+        creteBox.add(creteDiv7fl);
         
         creteDivfjr1 = new BooleanOption("Used-fjr1", "FJR 1 Regiment division card used in scenario");
-        creteBox.add(creteDivfjr1.getControls());
+        creteBox.add(creteDivfjr1);
         
         creteDivfjr2 = new BooleanOption("Used-fjr2", "FJR 2 Regiment division card used in scenario");
-        creteBox.add(creteDivfjr2.getControls());
-        
-        creteBox.add(new JLabel(" "));
+        creteBox.add(creteDivfjr2);
 
         artilleryScatterRule = new BooleanOption("ArtilleryScatterRule", "Report Artillery Scatter Direction on roll of 9");
-        creteBox.add(artilleryScatterRule.getControls());
+        creteBox.add(artilleryScatterRule);
 
-        optionBox.add(creteBox);
-        optionBox.add(new JLabel(" "));
-        
+        optionBox.add(creteBox, "growx,push");
       }
 
       if (UnitInfo.isTgdRules()) {
 
-        final Box ddBox = Box.createVerticalBox();
-        ddBox.setBorder(BorderFactory.createEtchedBorder());
-        ddBox.add(new JLabel(" "));
-        ddBox.add(new JLabel("The Greatest Day"));
-        ddBox.add(new JLabel(" "));
+        final ComponentPanel ddBox = new ComponentPanel();
+        ddBox.addHeading("The Greatest Day");
         telephoneCommand736 = new BooleanOption("736TelCom", "736 Rgt Command depends only on Phone Lines?");
-        ddBox.add(telephoneCommand736.getControls());
-        ddBox.add(new JLabel(" "));
+        ddBox.add(telephoneCommand736);
 
         attach_22arm = new AttachOption("Attach-22Arm", "22 Arm Brigade are attached to division: ", new String[] { TdcProperties.DIVISION_7TH, TdcProperties.DIVISION_50TH }, "7th-v-50th");
-        ddBox.add(attach_22arm.getControls());
-
-        optionBox.add(ddBox);
+        ddBox.add(attach_22arm);
 
         add10toSwordNavalRange = new BooleanOption(TdcProperties.ADD_10_TO_SWORD_NAVAL_RANGE, "+10 hexes to Sword Naval Range?");
-        ddBox.add(add10toSwordNavalRange.getControls());
-        ddBox.add(new JLabel(" "));
-        
+        ddBox.add(add10toSwordNavalRange);
+
         
         subRuleSet = new StringEnumOption (TdcProperties.SUB_RULESET, "The Greatest Day Rule Subset (1=GJS, 2=Utah, 3=Omaha, 4=Combined): ", new String[] {TdcProperties.RULES_GJS, TdcProperties.RULES_UTAH, TdcProperties.RULES_OMAHA, TdcProperties.RULES_COMBINED});
-        ddBox.add(subRuleSet.getControls());
-        ddBox.add(new JLabel(" "));
+        ddBox.add(subRuleSet);
 
         artilleryScatterRule = new BooleanOption("ArtilleryScatterRule", "Report Artillery Scatter Direction on roll of 9");
-        ddBox.add(artilleryScatterRule.getControls());
-        ddBox.add(new JLabel(" "));
+        ddBox.add(artilleryScatterRule);
 
-        optionBox.add(ddBox);
+        optionBox.add(ddBox, "growx,push");
 
       }
 
       if (UnitInfo.isTdcRules() || UnitInfo.isAmdRules()) {
-        final Box tdcBox = Box.createVerticalBox();
-        tdcBox.setBorder(BorderFactory.createEtchedBorder());
-        tdcBox.add(new JLabel(" "));
-        tdcBox.add(new JLabel("The Devils Cauldron"));
-        tdcBox.add(new JLabel(" "));
+        final ComponentPanel tdcBox = new ComponentPanel();
+        tdcBox.addHeading("The Devils Cauldron");
 
         aic505 = new BooleanOption("AIC-505 PIR", "505 PIR is always in command");
-        tdcBox.add(aic505.getControls());
+        tdcBox.add(aic505);
 
         commandBreakdown = new BooleanOption("Command-Breakdown", "Command Breakdown has occured (Scenario AD#1)");
-        tdcBox.add(commandBreakdown.getControls());
+        tdcBox.add(commandBreakdown);
 
         attach_CG_82AB = new AttachOption("Attach-CG", "Coldstream Guards are attached to division ", new String[] { TdcProperties.DIVISION_GDS, TdcProperties.DIVISION_82AB }, "Gds-v-82AB");
-        tdcBox.add(attach_CG_82AB.getControls());
+        tdcBox.add(attach_CG_82AB);
 
         attach_GdsInd_43rd = new AttachOption("Attach-GdsInd", "Guards Independent are attached to division ", new String[] { TdcProperties.DIVISION_GDS, TdcProperties.DIVISION_43RD }, "Gds-v-43rd");
-        tdcBox.add(attach_GdsInd_43rd.getControls());
+        tdcBox.add(attach_GdsInd_43rd);
 
         attach_82ABArt_Gds = new AttachOption("Attach-82ABArt", "82AB Artillery are attached to division ", new String[] { TdcProperties.DIVISION_82AB, TdcProperties.DIVISION_GDS }, "82AB-v-Gds");
-        tdcBox.add(attach_82ABArt_Gds.getControls());
+        tdcBox.add(attach_82ABArt_Gds);
 
         attach_FrInd_Hoh = new AttachOption("Attach-FrInd", "Frundsberg Independents are attached to division ", new String[] { TdcProperties.DIVISION_FR, TdcProperties.DIVISION_HOH }, "Fr-v-Hoh");
-        tdcBox.add(attach_FrInd_Hoh.getControls());
+        tdcBox.add(attach_FrInd_Hoh);
 
         attach_Bruhn_Hoh = new AttachOption("Attach-Bruhn", "KG Bruhn are attached to division ", new String[] { TdcProperties.DIVISION_VT, TdcProperties.DIVISION_HOH }, "VT-v-Hoh");
-        tdcBox.add(attach_Bruhn_Hoh.getControls());
-        tdcBox.add(new JLabel(" "));
+        tdcBox.add(attach_Bruhn_Hoh);
 
         if ( UnitInfo.isAmdRules()) {
           artilleryScatterRule = new BooleanOption("ArtilleryScatterRule", "Report Artillery Scatter Direction on roll of 9");
-          tdcBox.add(artilleryScatterRule.getControls());
+          tdcBox.add(artilleryScatterRule);
         }
 
-        optionBox.add(tdcBox);
-        optionBox.add(new JLabel(" "));
+        optionBox.add(tdcBox, "growx,push");
 
-        final Box germanReconfigBox = Box.createVerticalBox();
-        germanReconfigBox.setBorder(BorderFactory.createEtchedBorder());
+        final ComponentPanel germanReconfigBox = new ComponentPanel();
 
         attach_Harder_Spindler = new AttachOption("Attach-Harder-Spindler", "KG Harder are attached to Formation ", new String[] { TdcProperties.FORMATION_HARDER, TdcProperties.FORMATION_SPINDLER }, "S4.5.2-Harder");
 
@@ -248,29 +224,26 @@ public class TdcScenarioOptions extends Widget {
 
         chill_reorg = new ChillBooleanOption("Eindhoven-Chill", "Eindhoven R.C. has reorganised to KG Chill");
 
-        germanReconfigBox.add(new JLabel(" "));
-        germanReconfigBox.add(new JLabel("Where Eagles Dare"));
-        germanReconfigBox.add(new JLabel(" "));
+        germanReconfigBox.addHeading("Where Eagles Dare");
 
-        germanReconfigBox.add(attach_Harder_Spindler.getControls());
-        germanReconfigBox.add(attach_Krafft_Spindler.getControls());
-        germanReconfigBox.add(attach_vonAllwoerden_Spindler.getControls());
-        germanReconfigBox.add(new JLabel(" "));
+        germanReconfigBox.add(attach_Harder_Spindler);
+        germanReconfigBox.add(attach_Krafft_Spindler);
+        germanReconfigBox.add(attach_vonAllwoerden_Spindler);
+        germanReconfigBox.add(new JLabel(" "), "wrap");
 
-        germanReconfigBox.add(attach_Henke_Frundsberg.getControls());
-        germanReconfigBox.add(attach_Knaust_Frundsberg.getControls());
-        germanReconfigBox.add(attach_Reinhold_Frundsberg.getControls());
-        germanReconfigBox.add(attach_Euling_Frundsberg.getControls());
-        germanReconfigBox.add(new JLabel(" "));
+        germanReconfigBox.add(attach_Henke_Frundsberg);
+        germanReconfigBox.add(attach_Knaust_Frundsberg);
+        germanReconfigBox.add(attach_Reinhold_Frundsberg);
+        germanReconfigBox.add(attach_Euling_Frundsberg);
+        germanReconfigBox.add(new JLabel(" "), "wrap");
 
-        germanReconfigBox.add(chill_reorg.getControls());
-        germanReconfigBox.add(new JLabel(" "));
+        germanReconfigBox.add(chill_reorg);
 
-        optionBox.add(germanReconfigBox);
+        optionBox.add(germanReconfigBox, "growx,push");
 
       }
 
-      panel.add(optionBox);
+      panel.add(optionBox, BorderLayout.CENTER);
 
     }
 
@@ -302,6 +275,52 @@ public class TdcScenarioOptions extends Widget {
     }
   }
 
+  public class BoldLabel extends JLabel {
+    public BoldLabel(String label) {
+      super(label);
+      setFont(getFont().deriveFont(Font.BOLD));
+    }
+  }
+
+  public class ComponentPanel extends ComponentConfigPanel {
+    public ComponentPanel() {
+      super();
+      setLayout(new MigLayout(DEFAULT_COMPONENT_LAYOUT_CONSTRAINTS, DEFAULT_COMPONENT_COLUMN_CONSTRAINTS));
+      setBorder(BorderFactory.createEtchedBorder());
+    }
+
+    public void add(BasicOption option) {
+      super.add(new JLabel(option.getPrompt()), option.getConfigurer());
+    }
+
+    public void addHeading(String heading) {
+      add(new BoldLabel(heading), "growx,pushx,wrap");
+    }
+  }
+
+  public class BoldLabel extends JLabel {
+    public BoldLabel(String label) {
+      super(label);
+      setFont(getFont().deriveFont(Font.BOLD));
+    }
+  }
+
+  public class ComponentPanel extends ComponentConfigPanel {
+    public ComponentPanel() {
+      super();
+      setLayout(new MigLayout(DEFAULT_COMPONENT_LAYOUT_CONSTRAINTS, DEFAULT_COMPONENT_COLUMN_CONSTRAINTS));
+      setBorder(BorderFactory.createEtchedBorder());
+    }
+
+    public void add(BasicOption option) {
+      super.add(new JLabel(option.getPrompt()), option.getConfigurer());
+    }
+
+    public void addHeading(String heading) {
+      add(new BoldLabel(heading), "growx,pushx,wrap");
+    }
+  }
+
   public abstract static class BasicOption {
 
     protected String globalPropertyName;
@@ -314,6 +333,17 @@ public class TdcScenarioOptions extends Widget {
       globalPropertyName = propertyName;
       this.prompt = prompt;
       globalProperty = GameModule.getGameModule().getMutableProperty(globalPropertyName);
+    }
+
+    protected Configurer getConfigurer() {
+      if (config == null) {
+        getControls();
+      }
+      return config;
+    }
+
+    protected String getPrompt() {
+      return prompt;
     }
 
     protected abstract Configurer createConfigurer();
@@ -355,7 +385,7 @@ public class TdcScenarioOptions extends Widget {
     }
 
     protected Configurer createConfigurer() {
-      return new BooleanConfigurer("", prompt, "true".equals(globalProperty.getPropertyValue()));
+      return new BooleanConfigurer("", "", "true".equals(globalProperty.getPropertyValue()));
     }
 
     protected PropertyChangeListener createGlobalListener() {
@@ -375,7 +405,7 @@ public class TdcScenarioOptions extends Widget {
     }
 
     protected Configurer createConfigurer() {
-      return new BooleanConfigurer("", prompt, "2".equals(globalProperty.getPropertyValue()));
+      return new BooleanConfigurer("", "", "2".equals(globalProperty.getPropertyValue()));
     }
 
     protected PropertyChangeListener createGlobalListener() {
@@ -418,7 +448,7 @@ public class TdcScenarioOptions extends Widget {
     }
 
     protected Configurer createConfigurer() {
-      StringEnumConfigurer c = new StringEnumConfigurer("", prompt, options);
+      StringEnumConfigurer c = new StringEnumConfigurer("", "", options);
       c.setValue(globalProperty.getPropertyValue());
       return c;
     }
