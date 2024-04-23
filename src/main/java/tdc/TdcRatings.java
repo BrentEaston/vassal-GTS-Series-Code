@@ -40,6 +40,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import VASSAL.counters.TraitConfigPanel;
+import VASSAL.counters.TraitLayout;
 import net.miginfocom.swing.MigLayout;
 import VASSAL.build.module.documentation.HelpFile;
 import VASSAL.command.Command;
@@ -441,10 +443,18 @@ public class TdcRatings extends Decorator implements EditablePiece {
         organicAssaultRatingInput, organicDefRatingInput, organicFireColourInput,
         organicAssaultColourInput, organicMoveColourInput, organicRangeInput,
         organicMoveRatingInput, organicFlakRatingInput;
+
+    protected JLabel organicFireRatingLabel, organicTqrRatingLabel,
+      organicAssaultRatingLabel, organicDefRatingLabel, organicFireColourLabel,
+      organicAssaultColourLabel, organicMoveColourLabel, organicRangeLabel,
+      organicMoveRatingLabel, organicFlakRatingLabel, organicLabel,
+      organicArmouredLabel, organicAssaultDoubleLabel,organicRedTqrLabel, diffStepLabel,
+      fireColourLabel, rangeLabel, assaultColourLabel, assaultDoubleLabel, moveColourLabel;
+    
     protected BooleanConfigurer assaultDoubleInput, armouredInput, organicInput,
         organicArmouredInput, organicAssaultDoubleInput, diffStepInput, redTqrInput,
         organicRedTqrInput;
-    protected JPanel controls;
+    protected TraitConfigPanel controls;
 
     protected TdcRatings ratings;
 
@@ -462,8 +472,10 @@ public class TdcRatings extends Decorator implements EditablePiece {
       final PropertyChangeListener fieldListener = e -> showHideFields();
 
       ratings = p;
-      controls = new JPanel();
-      controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
+      controls = new TraitConfigPanel(
+        new TraitLayout(false,
+          "ins 0,gapy 4,hidemode 0,wrap 4",
+          "[right]rel[fill,100::]10[right]rel[fill,100::]"));
 
       findImages();
       findSteps();
@@ -475,7 +487,7 @@ public class TdcRatings extends Decorator implements EditablePiece {
       iconPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
       iconPanel.add(front);
-      iconPanel.add(transport, "wrap");
+      iconPanel.add(transport);
 
       xFront = new JPanel() {
         private static final long serialVersionUID = 1L;
@@ -500,148 +512,177 @@ public class TdcRatings extends Decorator implements EditablePiece {
       iconPanel.add(xTransport);
 
       iPanel.add(iconPanel);
-      controls.add(iPanel);
+      controls.add(iPanel, "span 4,center,wrap");
 
-      fireRatingInput = new StringEnumConfigurer(null, "Fire Rating:  ", FIRE_RATINGS);
-      fireRatingInput.setValue(p.fireRating);
-      controls.add(fireRatingInput.getControls());
-      fireRatingInput.addPropertyChangeListener(fieldListener);
-
-      fireColourInput = new StringEnumConfigurer(null, "Fire Rating Colour:  ", WEAPON_CLASSES);
-      fireColourInput.setValue(p.fireColour);
-      controls.add(fireColourInput.getControls());
-      fireColourInput.addPropertyChangeListener(fieldListener);
-
-      rangeInput = new StringEnumConfigurer(null, "Range:  ", RANGES);
-      rangeInput.setValue(p.range);
-      controls.add(rangeInput.getControls());
-      rangeInput.addPropertyChangeListener(fieldListener);
-
-      assaultRatingInput = new StringEnumConfigurer(null, "Assault Rating:  ", FIRE_RATINGS);
-      assaultRatingInput.setValue(p.assaultRating);
-      controls.add(assaultRatingInput.getControls());
-      assaultRatingInput.addPropertyChangeListener(fieldListener);
-
-      assaultColourInput = new StringEnumConfigurer(null, "Assault Rating Colour:  ",
-          WEAPON_CLASSES);
-      assaultColourInput.setValue(p.assaultColour);
-      controls.add(assaultColourInput.getControls());
-      assaultColourInput.addPropertyChangeListener(fieldListener);
-
-      assaultDoubleInput = new BooleanConfigurer(null, "Use Assault Rating twice (Red text)?",
-          p.assaultDouble);
-      controls.add(assaultDoubleInput.getControls());
-      assaultDoubleInput.addPropertyChangeListener(fieldListener);
-
-      flakRatingInput = new StringEnumConfigurer(null, "Flak Rating:  ", FIRE_RATINGS);
-      flakRatingInput.setValue(p.flakRating);
-      controls.add(flakRatingInput.getControls());
-      flakRatingInput.addPropertyChangeListener(fieldListener);
-
-      defRatingInput = new StringEnumConfigurer(null, "Defence Rating:  ", DEF_RATINGS);
-      defRatingInput.setValue(p.defRating);
-      controls.add(defRatingInput.getControls());
-      defRatingInput.addPropertyChangeListener(fieldListener);
-
-      armouredInput = new BooleanConfigurer(null, "Armoured (Black box)?", p.armoured);
-      controls.add(armouredInput.getControls());
-      armouredInput.addPropertyChangeListener(fieldListener);
-
-      tqrRatingInput = new StringEnumConfigurer(null, "TQR Rating:  ", TQR_RATINGS);
-      tqrRatingInput.setValue(p.tqrRating);
-      controls.add(tqrRatingInput.getControls());
-      tqrRatingInput.addPropertyChangeListener(fieldListener);
-
-      redTqrInput = new BooleanConfigurer(null, "TQR Rating is red?", p.redTqr);
-      controls.add(redTqrInput.getControls());
-      redTqrInput.addPropertyChangeListener(fieldListener);
-
-      moveRatingInput = new StringEnumConfigurer(null, "Movement Rating:  ", MOVE_RATINGS);
-      moveRatingInput.setValue(p.moveRating);
-      controls.add(moveRatingInput.getControls());
-      moveRatingInput.addPropertyChangeListener(fieldListener);
-
-      moveColourInput = new StringEnumConfigurer(null, "Movement Rating Colour:  ",
-          MOVEMENT_COLOURS);
-      moveColourInput.setValue(p.moveColour);
-      controls.add(moveColourInput.getControls());
-      moveColourInput.addPropertyChangeListener(fieldListener);
-
-      organicInput = new BooleanConfigurer(null, "Has Organic Transport?", p.organic);
-      controls.add(organicInput.getControls());
+      organicLabel = new JLabel("Has Organic Transport");
+      organicInput = new BooleanConfigurer(null, "", p.organic);
+      controls.add(organicLabel, organicInput);
       organicInput.addPropertyChangeListener(fieldListener);
 
-      diffStepInput = new BooleanConfigurer(null, "Step side has non-standard ratings?", p.diffStep);
-      controls.add(diffStepInput.getControls());
+      diffStepLabel = new JLabel("Step side has non-standard ratings");
+      diffStepInput = new BooleanConfigurer(null, "", p.diffStep);
+      controls.add(diffStepLabel, diffStepInput);
       diffStepInput.addPropertyChangeListener(fieldListener);
 
-      organicFireRatingInput = new StringEnumConfigurer(null, "Alt Fire Rating:  ", FIRE_RATINGS);
+      // Fire Rating
+      fireRatingInput = new StringEnumConfigurer(null, "", FIRE_RATINGS);
+      fireRatingInput.setValue(p.fireRating);
+      controls.add(new JLabel("Fire Rating"), fireRatingInput);
+      fireRatingInput.addPropertyChangeListener(fieldListener);
+
+      organicFireRatingLabel = new JLabel("Alt Fire Rating");
+      organicFireRatingInput = new StringEnumConfigurer(null, "", FIRE_RATINGS);
       organicFireRatingInput.setValue(p.organicFireRating);
-      controls.add(organicFireRatingInput.getControls());
+      controls.add(organicFireRatingLabel, organicFireRatingInput);
       organicFireRatingInput.addPropertyChangeListener(fieldListener);
 
-      organicFireColourInput = new StringEnumConfigurer(null, "Alt Fire Rating Colour:  ",
-          WEAPON_CLASSES);
+      // Fire Colour
+      fireColourLabel = new JLabel("Fire Rating Colour");
+      fireColourInput = new StringEnumConfigurer(null, "", WEAPON_CLASSES);
+      fireColourInput.setValue(p.fireColour);
+      controls.add(fireColourLabel, fireColourInput);
+      fireColourInput.addPropertyChangeListener(fieldListener);
+
+      organicFireColourLabel = new JLabel("Alt Fire Rating Colour");
+      organicFireColourInput = new StringEnumConfigurer(null, "",
+        WEAPON_CLASSES);
       organicFireColourInput.setValue(p.organicFireColour);
-      controls.add(organicFireColourInput.getControls());
+      controls.add(organicFireColourLabel, organicFireColourInput);
       organicFireColourInput.addPropertyChangeListener(fieldListener);
 
-      organicRangeInput = new StringEnumConfigurer(null, "Alt Range:  ", RANGES);
+      // Range
+      rangeLabel = new JLabel("Range");
+      rangeInput = new StringEnumConfigurer(null, "", RANGES);
+      rangeInput.setValue(p.range);
+      controls.add(rangeLabel, rangeInput);
+      rangeInput.addPropertyChangeListener(fieldListener);
+
+      organicRangeLabel = new JLabel("Alt Range");
+      organicRangeInput = new StringEnumConfigurer(null, "", RANGES);
       organicRangeInput.setValue(p.organicRange);
-      controls.add(organicRangeInput.getControls());
+      controls.add(organicRangeLabel, organicRangeInput);
       organicRangeInput.addPropertyChangeListener(fieldListener);
 
-      organicAssaultRatingInput = new StringEnumConfigurer(null, "Alt Assault Rating:  ",
-          FIRE_RATINGS);
+      // Assault Rating
+      assaultRatingInput = new StringEnumConfigurer(null, "", FIRE_RATINGS);
+      assaultRatingInput.setValue(p.assaultRating);
+      controls.add(new JLabel("Assault Rating"), assaultRatingInput);
+      assaultRatingInput.addPropertyChangeListener(fieldListener);
+
+      organicAssaultRatingLabel = new JLabel("Alt Assault Rating");
+      organicAssaultRatingInput = new StringEnumConfigurer(null, "",
+        FIRE_RATINGS);
       organicAssaultRatingInput.setValue(p.organicAssaultRating);
-      controls.add(organicAssaultRatingInput.getControls());
+      controls.add(organicAssaultRatingLabel, organicAssaultRatingInput);
       organicAssaultRatingInput.addPropertyChangeListener(fieldListener);
 
-      organicAssaultColourInput = new StringEnumConfigurer(null, "Alt Assault Rating Colour:  ",
+      // Assault rating colour
+      assaultColourLabel = new JLabel("Assault Rating Colour");
+      assaultColourInput = new StringEnumConfigurer(null, "",
           WEAPON_CLASSES);
+      assaultColourInput.setValue(p.assaultColour);
+      controls.add(assaultColourLabel, assaultColourInput);
+      assaultColourInput.addPropertyChangeListener(fieldListener);
+
+      organicAssaultColourLabel = new JLabel("Alt Assault Rating Colour");
+      organicAssaultColourInput = new StringEnumConfigurer(null, "", WEAPON_CLASSES);
       organicAssaultColourInput.setValue(p.organicAssaultColour);
-      controls.add(organicAssaultColourInput.getControls());
+      controls.add(organicAssaultColourLabel, organicAssaultColourInput);
       organicAssaultColourInput.addPropertyChangeListener(fieldListener);
 
-      organicAssaultDoubleInput = new BooleanConfigurer(null,
-          "Use Alt Assault Rating twice (Red text)?", p.organicAssaultDouble);
-      controls.add(organicAssaultDoubleInput.getControls());
+      // Assault Double Attack
+      assaultDoubleLabel = new JLabel("Use Assault Rating twice (Red text)");
+      assaultDoubleInput = new BooleanConfigurer(null, "",
+          p.assaultDouble);
+      controls.add(assaultDoubleLabel, assaultDoubleInput);
+      assaultDoubleInput.addPropertyChangeListener(fieldListener);
+
+      organicAssaultDoubleLabel = new JLabel("Use Alt Assault Rating twice (Red text)");
+      organicAssaultDoubleInput = new BooleanConfigurer(null, "", p.organicAssaultDouble);
+      controls.add(organicAssaultDoubleLabel, organicAssaultDoubleInput);
       organicAssaultDoubleInput.addPropertyChangeListener(fieldListener);
 
-      organicFlakRatingInput = new StringEnumConfigurer(null, "Alt Flak Rating:  ", FIRE_RATINGS);
+      // Flak Rating
+      flakRatingInput = new StringEnumConfigurer(null, "", FIRE_RATINGS);
+      flakRatingInput.setValue(p.flakRating);
+      controls.add(new JLabel("Flak Rating"), flakRatingInput);
+      flakRatingInput.addPropertyChangeListener(fieldListener);
+
+      organicFlakRatingLabel = new JLabel("Alt Flak Rating");
+      organicFlakRatingInput = new StringEnumConfigurer(null, "", FIRE_RATINGS);
       organicFlakRatingInput.setValue(p.organicFlakRating);
-      controls.add(organicFlakRatingInput.getControls());
+      controls.add(organicFlakRatingLabel, organicFlakRatingInput);
       organicFlakRatingInput.addPropertyChangeListener(fieldListener);
 
-      organicDefRatingInput = new StringEnumConfigurer(null, "Alt Defence Rating:  ", DEF_RATINGS);
+      // Defence Rating
+      defRatingInput = new StringEnumConfigurer(null, "", DEF_RATINGS);
+      defRatingInput.setValue(p.defRating);
+      controls.add(new JLabel("Defence Rating"), defRatingInput);
+      defRatingInput.addPropertyChangeListener(fieldListener);
+
+      organicDefRatingLabel = new JLabel("Alt Defence Rating");
+      organicDefRatingInput = new StringEnumConfigurer(null, "", DEF_RATINGS);
       organicDefRatingInput.setValue(p.organicDefRating);
-      controls.add(organicDefRatingInput.getControls());
+      controls.add(organicDefRatingLabel, organicDefRatingInput);
       organicDefRatingInput.addPropertyChangeListener(fieldListener);
 
-      organicArmouredInput = new BooleanConfigurer(null, "Alt Armoured (Black box)?",
-          p.organicArmoured);
-      controls.add(organicArmouredInput.getControls());
+      // Armoured?
+      armouredInput = new BooleanConfigurer(null, "", p.armoured);
+      controls.add(new JLabel("Armoured (Black box)"), armouredInput);
+      armouredInput.addPropertyChangeListener(fieldListener);
+
+      organicArmouredLabel = new JLabel("Alt Armoured (Black box)");
+      organicArmouredInput = new BooleanConfigurer(null, "", p.organicArmoured);
+      controls.add(organicArmouredLabel, organicArmouredInput);
       organicArmouredInput.addPropertyChangeListener(fieldListener);
 
-      organicTqrRatingInput = new StringEnumConfigurer(null, "Alt TQR Rating:  ", TQR_RATINGS);
+      // TQR Rating
+      tqrRatingInput = new StringEnumConfigurer(null, "", TQR_RATINGS);
+      tqrRatingInput.setValue(p.tqrRating);
+      controls.add(new JLabel("TQR Rating"), tqrRatingInput);
+      tqrRatingInput.addPropertyChangeListener(fieldListener);
+
+      organicTqrRatingLabel = new JLabel("Alt TQR Rating");
+      organicTqrRatingInput = new StringEnumConfigurer(null, "", TQR_RATINGS);
       organicTqrRatingInput.setValue(p.organicTqrRating);
-      controls.add(organicTqrRatingInput.getControls());
+      controls.add(organicTqrRatingLabel, organicTqrRatingInput);
       organicTqrRatingInput.addPropertyChangeListener(fieldListener);
 
-      organicRedTqrInput = new BooleanConfigurer(null, "TQR Rating is red?", p.organicRedTqr);
-      controls.add(organicRedTqrInput.getControls());
+      // Red TQR?
+      redTqrInput = new BooleanConfigurer(null, "", p.redTqr);
+      controls.add(new JLabel("TQR Rating is red"), redTqrInput);
+      redTqrInput.addPropertyChangeListener(fieldListener);
+
+      organicRedTqrLabel = new JLabel("TQR Rating is red");
+      organicRedTqrInput = new BooleanConfigurer(null, "", p.organicRedTqr);
+      controls.add(organicRedTqrLabel, organicRedTqrInput);
       organicRedTqrInput.addPropertyChangeListener(fieldListener);
 
-      organicMoveRatingInput = new StringEnumConfigurer(null, "Alt Movement Rating:  ",
-          MOVE_RATINGS);
+      // Move Rating
+      moveRatingInput = new StringEnumConfigurer(null, "", MOVE_RATINGS);
+      controls.add(new JLabel("Movement Rating"), moveRatingInput);
+      moveRatingInput.setValue(p.moveRating);
+      moveRatingInput.addPropertyChangeListener(fieldListener);
+
+      organicMoveRatingLabel = new JLabel("Alt Movement Rating");
+      organicMoveRatingInput = new StringEnumConfigurer(null, "",
+        MOVE_RATINGS);
       organicMoveRatingInput.setValue(p.organicMoveRating);
-      controls.add(organicMoveRatingInput.getControls());
+      controls.add(organicMoveRatingLabel, organicMoveRatingInput);
       organicMoveRatingInput.addPropertyChangeListener(fieldListener);
 
-      organicMoveColourInput = new StringEnumConfigurer(null, "Alt Movement Rating Colour:  ",
+      // Move Color
+      moveColourLabel = new JLabel("Movement Rating Colour");
+      moveColourInput = new StringEnumConfigurer(null, "",
           MOVEMENT_COLOURS);
+      moveColourInput.setValue(p.moveColour);
+      controls.add(moveColourLabel, moveColourInput);
+      moveColourInput.addPropertyChangeListener(fieldListener);
+
+      organicMoveColourLabel = new JLabel("Alt Movement Rating Colour");
+      organicMoveColourInput = new StringEnumConfigurer(null, "",  MOVEMENT_COLOURS);
       organicMoveColourInput.setValue(p.organicMoveColour);
-      controls.add(organicMoveColourInput.getControls());
+      controls.add(organicMoveColourLabel, organicMoveColourInput);
       organicMoveColourInput.addPropertyChangeListener(fieldListener);
 
       showHideFields();
@@ -651,40 +692,74 @@ public class TdcRatings extends Decorator implements EditablePiece {
     public void showHideFields() {
       boolean showFire = !("No".equals(fireRatingInput.getValueString()));
       fireColourInput.getControls().setVisible(showFire);
+      fireColourLabel.setVisible(showFire);
       rangeInput.getControls().setVisible(showFire);
+      rangeLabel.setVisible(showFire);
 
       boolean showAssault = !("No".equals(assaultRatingInput.getValueString()));
       assaultColourInput.getControls().setVisible(showAssault);
+      assaultColourLabel.setVisible(showAssault);
       assaultDoubleInput.getControls().setVisible(showAssault);
+      assaultDoubleLabel.setVisible(showAssault);
 
       boolean showMove = !("No".equals(moveRatingInput.getValueString()) || "*"
           .equals(moveRatingInput.getValueString()));
       moveColourInput.getControls().setVisible(showMove);
+      moveColourLabel.setVisible(showMove);
 
       boolean showOrganic = organicInput.getValueString().equals("true");
       boolean showDiff = diffStepInput.getValueString().equals("true");
       boolean showAlt = (showOrganic || showDiff);
 
       diffStepInput.getControls().setVisible(!showOrganic);
+      diffStepLabel.setVisible(!showOrganic);
       organicInput.getControls().setVisible(!showDiff);
+      organicLabel.setVisible(!showDiff);
 
       boolean showOrganicFire = !("No".equals(organicFireRatingInput.getValueString()));
       boolean showOrganicAssault = !("No".equals(organicAssaultRatingInput.getValueString()));
       boolean showOrganicMove = !("No".equals(organicMoveRatingInput.getValueString()) || "*"
           .equals(organicMoveRatingInput.getValueString()));
+
       organicFireRatingInput.getControls().setVisible(showAlt);
+      organicFireRatingLabel.setVisible(showAlt);
+
       organicTqrRatingInput.getControls().setVisible(showAlt);
+      organicTqrRatingLabel.setVisible(showAlt);
+
       organicAssaultRatingInput.getControls().setVisible(showAlt);
+      organicAssaultRatingLabel.setVisible(showAlt);
+
       organicDefRatingInput.getControls().setVisible(showAlt);
+      organicDefRatingLabel.setVisible(showAlt);
+
       organicFireColourInput.getControls().setVisible(showAlt && showOrganicFire);
+      organicFireColourLabel.setVisible(showAlt && showOrganicFire);
+
       organicAssaultColourInput.getControls().setVisible(showAlt && showOrganicAssault);
+      organicAssaultColourLabel.setVisible(showAlt && showOrganicAssault);
+
       organicMoveColourInput.getControls().setVisible(showAlt && showOrganicMove);
+      organicMoveColourLabel.setVisible(showAlt && showOrganicMove);
+
       organicRangeInput.getControls().setVisible(showAlt && showOrganicFire);
+      organicRangeLabel.setVisible(showAlt && showOrganicFire);
+
       organicMoveRatingInput.getControls().setVisible(showAlt);
+      organicMoveRatingLabel.setVisible(showAlt);
+
       organicArmouredInput.getControls().setVisible(showAlt);
+      organicArmouredLabel.setVisible(showAlt);
+
       organicAssaultDoubleInput.getControls().setVisible(showAlt && showOrganicAssault);
+      organicAssaultDoubleLabel.setVisible(showAlt && showOrganicAssault);
+
       organicRedTqrInput.getControls().setVisible(showAlt);
+      organicRedTqrLabel.setVisible(showAlt);
+
       organicFlakRatingInput.getControls().setVisible(showAlt);
+      organicFlakRatingLabel.setVisible(showAlt);
+
       Window w = SwingUtilities.getWindowAncestor(controls);
 
       xFront.repaint();
@@ -692,7 +767,9 @@ public class TdcRatings extends Decorator implements EditablePiece {
 
       if (w != null) {
         w.pack();
+        w.repaint();
       }
+
     }
 
     public Component getControls() {
@@ -793,7 +870,9 @@ public class TdcRatings extends Decorator implements EditablePiece {
     protected void drawFront(Graphics g) {
 
       Color fg = null, bg = null;
-      Rectangle bounds = new Rectangle(0, -75, 75, 75);
+      final Rectangle bounds = new Rectangle(0, -75, 75, 75);
+      g.setColor(COLOR_WHITE);
+      g.fillRect(bounds.x, bounds.y , 75, 75);
 
       final String fireRating = fireRatingInput.getValueString();
       final String fireColor = fireColourInput.getValueString();
@@ -890,6 +969,10 @@ public class TdcRatings extends Decorator implements EditablePiece {
 
       // Do not draw anything if the counter is a one step non-organic unit
 
+      final Rectangle bounds = new Rectangle(0, -75, 75, 75);
+      g.setColor(COLOR_WHITE);
+      g.fillRect(bounds.x, bounds.y , 75, 75);
+
       boolean showOrganic = organicInput.getValueString().equals("true");
       boolean showDiff = diffStepInput.getValueString().equals("true");
       if (!showOrganic && !showDiff && stepImage == null) {
@@ -897,7 +980,7 @@ public class TdcRatings extends Decorator implements EditablePiece {
       }
 
       Color fg = null, bg = null;
-      Rectangle bounds = new Rectangle(0, -75, 75, 75);
+
 
       String fireRating;
       String fireColor;
@@ -1041,7 +1124,9 @@ public class TdcRatings extends Decorator implements EditablePiece {
         g.setColor(COLOR_BLACK);
         g.fillRect(bounds.x + 40, bounds.y + 78, 15, 9);
       }
-      if ("1".equals(steps)) {
+
+      // Draw only one step dot for a 1 step unit, or a 2 step non-organic unit
+      if ("1".equals(steps) || ("2".equals(steps) && !"true".equals(organic))) {
         g.setColor(COLOR_RED);
         g.fillOval(bounds.x + 46, bounds.y + 80, 5, 5);
       }
