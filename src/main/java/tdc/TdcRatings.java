@@ -487,7 +487,7 @@ public class TdcRatings extends Decorator implements EditablePiece {
       iconPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
       iconPanel.add(front);
-      iconPanel.add(transport);
+      iconPanel.add(transport, "wrap");
 
       xFront = new JPanel() {
         private static final long serialVersionUID = 1L;
