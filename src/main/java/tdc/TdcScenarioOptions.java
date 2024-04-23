@@ -281,30 +281,6 @@ public class TdcScenarioOptions extends Widget {
       setFont(getFont().deriveFont(Font.BOLD));
     }
   }
-
-  public class ComponentPanel extends ComponentConfigPanel {
-    public ComponentPanel() {
-      super();
-      setLayout(new MigLayout(DEFAULT_COMPONENT_LAYOUT_CONSTRAINTS, DEFAULT_COMPONENT_COLUMN_CONSTRAINTS));
-      setBorder(BorderFactory.createEtchedBorder());
-    }
-
-    public void add(BasicOption option) {
-      super.add(new JLabel(option.getPrompt()), option.getConfigurer());
-    }
-
-    public void addHeading(String heading) {
-      add(new BoldLabel(heading), "growx,pushx,wrap");
-    }
-  }
-
-  public class BoldLabel extends JLabel {
-    public BoldLabel(String label) {
-      super(label);
-      setFont(getFont().deriveFont(Font.BOLD));
-    }
-  }
-
   public class ComponentPanel extends ComponentConfigPanel {
     public ComponentPanel() {
       super();
