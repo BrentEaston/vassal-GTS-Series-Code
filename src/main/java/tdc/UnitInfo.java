@@ -1496,6 +1496,16 @@ public class UnitInfo {
           addDefenceModifier("Hero", -2, unit);
         }
 
+        // Alone & Afraid Marker?
+        else if (TdcProperties.TYPE_HERO.equals(type)) {
+          adjustFireRating("Alone & Afraid", -1);
+          addAttackModifier("Alone & Afraid", -1);
+          adjustAssaultRating("Alone & Afraid", -1);
+          adjustTqrRating("Alone & Afraid", -1);
+          adjustDefenceRating("Alone & Afraid", +1);
+          addDefenceModifier("Alone & Afraid", +1, unit);
+        }
+
         // Cave (Tinian)
         else if (TdcProperties.TYPE_CAVE.equals(type)) {
           adjustDefenceRating("In Cave", -3);

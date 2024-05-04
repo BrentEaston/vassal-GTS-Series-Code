@@ -241,6 +241,7 @@ public interface TdcProperties {
   String TYPE_ARTILLERY_PARK = "APark";
   String TYPE_BOCAGE = "Bocage";
   String TYPE_HERO = "Hero";
+  String TYPE_ALONE = "Alone";
   String TYPE_ARTILLERY_MARKER = "ArtilleryMarker";
   String TYPE_BEACH_DEFENCE = "BeachDefence";
   String TYPE_AIR = "Air";
