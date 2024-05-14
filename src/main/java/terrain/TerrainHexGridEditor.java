@@ -593,7 +593,7 @@ public class TerrainHexGridEditor extends GridEditor implements ActionListener, 
      */
     final JPanel optionsPanel = new JPanel();
     optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-    mapOpacity = new OpacityConfigurer(null, "Map Opacity", 75);
+    mapOpacity = new OpacityConfigurer(null, "Map Opacity", 100);
     mapOpacity.addPropertyChangeListener(e -> view.repaint());
     optionsPanel.add(mapOpacity.getControls());
     tabPane.add(OPTIONS, new JScrollPane(optionsPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
