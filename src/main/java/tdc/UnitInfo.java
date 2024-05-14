@@ -2037,8 +2037,9 @@ public class UnitInfo {
 
       panel.setLayout(new MigLayout("", "[][center][center][]"));
 
-      final Font headFont = new Font(Font.DIALOG, Font.BOLD, 12);
-      final Font mainFont = new Font(Font.DIALOG, Font.BOLD, 14);
+      final double os_scale = Info.getSystemScaling();
+      final Font headFont = new Font(Font.DIALOG, Font.BOLD, (int) (12 * os_scale));
+      final Font mainFont = new Font(Font.DIALOG, Font.BOLD, (int) (14 * os_scale));
 
       label = new JLabel(unitName);
       label.setFont(mainFont);
@@ -2057,53 +2058,63 @@ public class UnitInfo {
       label.setFont(headFont);
       panel.add(label, "wrap");
 
-      panel.add(new JLabel("Movement"));
-      panel.add(new JLabel(baseRatings.get(TdcRatings.MOVE_RATING)));
-      panel.add(new JLabel(curRatings.get(TdcRatings.MOVE_RATING)));
-      panel.add(new JLabel(info.getMoveDetails()), "wrap");
+      panel.add(new Label("Movement"));
+      panel.add(new Label(baseRatings.get(TdcRatings.MOVE_RATING)));
+      panel.add(new Label(curRatings.get(TdcRatings.MOVE_RATING)));
+      panel.add(new Label(info.getMoveDetails()), "wrap");
 
-      panel.add(new JLabel("Fire"));
-      panel.add(new JLabel(baseRatings.get(TdcRatings.FIRE_RATING)));
-      panel.add(new JLabel(curRatings.get(TdcRatings.FIRE_RATING)));
-      panel.add(new JLabel(info.getFireDetails()), "wrap");
+      panel.add(new Label("Fire"));
+      panel.add(new Label(baseRatings.get(TdcRatings.FIRE_RATING)));
+      panel.add(new Label(curRatings.get(TdcRatings.FIRE_RATING)));
+      panel.add(new Label(info.getFireDetails()), "wrap");
 
-      panel.add(new JLabel("Assault"));
-      panel.add(new JLabel(baseRatings.get(TdcRatings.ASSAULT_RATING)));
-      panel.add(new JLabel(curRatings.get(TdcRatings.ASSAULT_RATING)));
-      panel.add(new JLabel(info.getAssaultDetails()), "wrap");
+      panel.add(new Label("Assault"));
+      panel.add(new Label(baseRatings.get(TdcRatings.ASSAULT_RATING)));
+      panel.add(new Label(curRatings.get(TdcRatings.ASSAULT_RATING)));
+      panel.add(new Label(info.getAssaultDetails()), "wrap");
 
-      panel.add(new JLabel("TQR"));
-      panel.add(new JLabel(baseRatings.get(TdcRatings.TQR_RATING)));
-      panel.add(new JLabel(curRatings.get(TdcRatings.TQR_RATING)));
-      panel.add(new JLabel(info.getTqrDetails()), "wrap");
+      panel.add(new Label("TQR"));
+      panel.add(new Label(baseRatings.get(TdcRatings.TQR_RATING)));
+      panel.add(new Label(curRatings.get(TdcRatings.TQR_RATING)));
+      panel.add(new Label(info.getTqrDetails()), "wrap");
 
-      panel.add(new JLabel("Defence"));
-      panel.add(new JLabel(baseRatings.get(TdcRatings.DEF_RATING)));
+      panel.add(new Label("Defence"));
+      panel.add(new Label(baseRatings.get(TdcRatings.DEF_RATING)));
       String def = curRatings.get(TdcRatings.DEF_RATING);
       if (def == null)
         def = "0";
       if (!def.equals("0") && !def.startsWith("-") && !def.startsWith("+")) {
         def = "+" + def;
       }
-      panel.add(new JLabel(def));
-      panel.add(new JLabel(info.getDefenceDetails()), "wrap");
+      panel.add(new Label(def));
+      panel.add(new Label(info.getDefenceDetails()), "wrap");
 
-      panel.add(new JLabel("Range"));
-      panel.add(new JLabel(baseRatings.get(TdcRatings.RANGE)));
-      panel.add(new JLabel(curRatings.get(TdcRatings.RANGE)));
-      panel.add(new JLabel(info.getRangeDetails()), "wrap");
+      panel.add(new Label("Range"));
+      panel.add(new Label(baseRatings.get(TdcRatings.RANGE)));
+      panel.add(new Label(curRatings.get(TdcRatings.RANGE)));
+      panel.add(new Label(info.getRangeDetails()), "wrap");
 
-      panel.add(new JLabel("Max LOS"));
-      panel.add(new JLabel(""));
-      panel.add(new JLabel(String.valueOf(info.getMaxLOS())));
-      panel.add(new JLabel(info.getMaxLOSReason()), "wrap");
+      panel.add(new Label("Max LOS"));
+      panel.add(new Label(""));
+      panel.add(new Label(String.valueOf(info.getMaxLOS())));
+      panel.add(new Label(info.getMaxLOSReason()), "wrap");
 
-      panel.add(new JLabel("May Assault?"));
-      panel.add(new JLabel(""));
-      panel.add(new JLabel(""));
-      panel.add(new JLabel(info.getAssaultReason()), "wrap");
+      panel.add(new Label("May Assault?"));
+      panel.add(new Label(""));
+      panel.add(new Label(""));
+      panel.add(new Label(info.getAssaultReason()), "wrap");
     }
 
+  }
+
+  private static class Label extends JLabel {
+
+    final Font labelFont = new Font(Font.DIALOG, Font.PLAIN, (int) (12 * Info.getSystemScaling()));
+
+    public Label(String text) {
+      super(text);
+      setFont(labelFont);
+    }
   }
 
 }

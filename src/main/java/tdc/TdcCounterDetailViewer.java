@@ -173,7 +173,7 @@ public class TdcCounterDetailViewer extends AbstractConfigurable implements Draw
   protected Color fgColor = Color.black;
   protected Color bgColor;
   protected Color saveBgColor;
-  protected int fontSize = 9;
+  protected int fontSize = 12;
   protected PropertyExpression propertyFilter = new PropertyExpression();
 
   protected Rectangle bounds;
@@ -210,7 +210,7 @@ public class TdcCounterDetailViewer extends AbstractConfigurable implements Draw
     map.addDrawComponent(this);
     String keyDesc = hotkey == null ? "" : "(" + HotKeyConfigurer.getString(hotkey) + ")";
     GameModule.getGameModule().getPrefs().addOption(Resources.getString("Prefs.general_tab"), new BooleanConfigurer(USE_KEYBOARD, Resources.getString("CounterDetailViewer.use_prompt", keyDesc), Boolean.FALSE));
-    GameModule.getGameModule().getPrefs().addOption(Resources.getString("Prefs.general_tab"), new IntConfigurer(PREFERRED_DELAY, Resources.getString("CounterDetailViewer.delay_prompt"), new Integer(delay)));
+    GameModule.getGameModule().getPrefs().addOption(Resources.getString("Prefs.general_tab"), new IntConfigurer(PREFERRED_DELAY, Resources.getString("CounterDetailViewer.delay_prompt"), Integer.valueOf(delay)));
 
     view.addMouseMotionListener(this);
     view.addMouseListener(this);
@@ -239,7 +239,8 @@ public class TdcCounterDetailViewer extends AbstractConfigurable implements Draw
     }
 
     bounds = new Rectangle(pt.x, pt.y, 0, 0);
-    os_scale = Info.getSystemScaling();
+
+    os_scale = ((Graphics2D) g).getDeviceConfiguration().getDefaultTransform().getScaleX();
 
     if (graphicsVisible) {
       drawGraphics(g, pt, comp, displayablePieces);
@@ -700,7 +701,8 @@ public class TdcCounterDetailViewer extends AbstractConfigurable implements Draw
     }
 
     final Font f = new Font(Font.DIALOG, Font.PLAIN, fontSize);
-    g.setFont(f);
+    g.setFont(f.deriveFont((float)(fontSize * os_scale)));
+    //g.setFont(f);
 
     // If
     if (! displayablePieces.isEmpty()) {
@@ -771,7 +773,7 @@ public class TdcCounterDetailViewer extends AbstractConfigurable implements Draw
     if (label != null) {
       Graphics2D g2d = ((Graphics2D) g);
       g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-      LabelUtils.drawLabel(g, label, pt.x, pt.y, new Font(Font.DIALOG, Font.PLAIN, fontSize), hAlign, vAlign, fg, bg, Color.black);
+      LabelUtils.drawLabel(g, label, pt.x, pt.y, new Font(Font.DIALOG, Font.PLAIN, (int) (fontSize * os_scale)), hAlign, vAlign, fg, bg, Color.black);
       g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     }
 
