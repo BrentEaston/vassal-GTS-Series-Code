@@ -153,16 +153,7 @@ public class TdcScenarioOptions extends Widget {
 
         final ComponentPanel ddBox = new ComponentPanel();
         ddBox.addHeading("The Greatest Day");
-        telephoneCommand736 = new BooleanOption("736TelCom", "736 Rgt Command depends only on Phone Lines?");
-        ddBox.add(telephoneCommand736);
 
-        attach_22arm = new AttachOption("Attach-22Arm", "22 Arm Brigade are attached to division: ", new String[] { TdcProperties.DIVISION_7TH, TdcProperties.DIVISION_50TH }, "7th-v-50th");
-        ddBox.add(attach_22arm);
-
-        add10toSwordNavalRange = new BooleanOption(TdcProperties.ADD_10_TO_SWORD_NAVAL_RANGE, "+10 hexes to Sword Naval Range?");
-        ddBox.add(add10toSwordNavalRange);
-
-        
         subRuleSet = new StringEnumOption (TdcProperties.SUB_RULESET, "The Greatest Day Rule Subset (1=GJS, 2=Utah, 3=Omaha, 4=Combined): ", new String[] {TdcProperties.RULES_GJS, TdcProperties.RULES_UTAH, TdcProperties.RULES_OMAHA, TdcProperties.RULES_COMBINED});
         ddBox.add(subRuleSet);
 
@@ -170,6 +161,24 @@ public class TdcScenarioOptions extends Widget {
         ddBox.add(artilleryScatterRule);
 
         optionBox.add(ddBox, "growx,push");
+
+        final ComponentPanel sjdBox = new ComponentPanel();
+        sjdBox.addHeading("Sword, Juno, Gold");
+
+        telephoneCommand736 = new BooleanOption("736TelCom", "736 Rgt Command depends only on Phone Lines?");
+        sjdBox.add(telephoneCommand736);
+
+        attach_22arm = new AttachOption("Attach-22Arm", "22 Arm Brigade are attached to division: ", new String[] { TdcProperties.DIVISION_7TH, TdcProperties.DIVISION_50TH }, "7th-v-50th");
+        sjdBox.add(attach_22arm);
+
+        add10toSwordNavalRange = new BooleanOption(TdcProperties.ADD_10_TO_SWORD_NAVAL_RANGE, "+10 hexes to Sword Naval Range?");
+        sjdBox.add(add10toSwordNavalRange);
+
+        optionBox.add(sjdBox, "growx,push");
+
+        final ComponentPanel uBox = new ComponentPanel();
+        uBox.addHeading("Utah");
+        optionBox.add(uBox, "growx,push");
 
       }
 
