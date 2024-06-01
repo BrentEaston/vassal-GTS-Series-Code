@@ -464,9 +464,9 @@ public class TerrainHexGrid extends HexGrid {
       double dd = x - origin.x + dx / 3;
       float result = ((float) (2 * dx / 3 * (int) (floor(x - origin.x + dx / 3) * 3 / (2 * dx)) + origin.x));
 
-      // Fix issue with edges crossing top border of map
+      // Fix issue with edges crossing border of map
       if (dd < 0) {
-        return (float) (-result + dx / 3);
+        return  result - ( 2.0f * (float) dx / 3.0f);
       }
 
       return (x - origin.x + dx / 3) >= 0 ? result : -result;
