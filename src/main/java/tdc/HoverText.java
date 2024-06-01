@@ -47,7 +47,10 @@ public class HoverText extends Decorator implements EditablePiece {
   protected KeyCommand setHoverCommand;
   protected String setHoverCommandName;
   protected KeyStroke setHoverKey;
+
+  // The hoveText has moved from Type to State so it refreshes properly.
   protected String hoverText;
+  protected String oldHoverText;
   
   public HoverText() {
     this(ID + "Hover;P;", null);
@@ -88,7 +91,7 @@ public class HoverText extends Decorator implements EditablePiece {
     SequenceEncoder.Decoder st = new SequenceEncoder.Decoder(type, ';');
     setHoverCommandName = st.nextToken();
     setHoverKey = st.nextKeyStroke('P');
-    hoverText = st.nextToken("");
+    oldHoverText = st.nextToken("");
     keyCommands = null;
     
   }
@@ -98,15 +101,21 @@ public class HoverText extends Decorator implements EditablePiece {
   }
 
   public void mySetState(String newState) {
+    SequenceEncoder.Decoder st = new SequenceEncoder.Decoder(newState, ';');
+    hoverText = st.nextToken("");
+    if (hoverText.isEmpty() && !oldHoverText.isEmpty()) {
+      hoverText = oldHoverText;
+    }
   }
 
   public String myGetState() {
-    return "";
+    final SequenceEncoder se = new SequenceEncoder(hoverText, ';');
+    return se.getValue();
   }
 
   public String myGetType() {
     SequenceEncoder se = new SequenceEncoder(';');
-    se.append(setHoverCommandName).append(setHoverKey).append(hoverText);
+    se.append(setHoverCommandName).append(setHoverKey).append("");
     return ID + se.getValue();
   }
 

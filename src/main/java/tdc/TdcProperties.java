@@ -48,8 +48,10 @@ public interface TdcProperties {
   String MORTAR = "Mortar";        // Mortar Range Type
 
   String ARMY = "Army";           // Owning Army Marker
+
   String FORMATION = "Formation"; // Owning Formation Marker
   String FORMATION2 = "Formation2"; // Secondary command Formation Marker
+  String BASE_FORMATION = "MyFormation"; // Base Formation Marker
   String DIVISION = "Division";   // Owning Division Marker
   String DIVISION2 = "Division2";   // Secondary command Division Marker
 
@@ -117,9 +119,12 @@ public interface TdcProperties {
   String DIVISION_716 = "716";
   String DIVISION_346 = "346";
   String DIVISION_352 = "352";
+  String DIVISION_352U = "352u";   // 352 in Utah gameset
   String DIVISION_CDO = "cdo";
   String DIVISION_NAVAL = "Naval";
   String DIVISION_709 = "709";
+  String BOARD_UTAH_BEACH1 = "Utah-ua";
+  String BOARD_UTAH_BEACH2 = "Utah-up";
 
   String FORMATION_POLISH = "Polish Para Brigade";
   String FORMATION_HARDER = "KG Harder";
@@ -132,6 +137,8 @@ public interface TdcProperties {
   String FORMATION_EULING = "KG Euling";
   String FORMATION_FRUNDSBERG = "KG Frundsberg";
   String FORMATION_716_736 = "716-736";
+
+  String FORMATION_KEIL = "709-keil";
 
   String RULESET = "Ruleset";
   String RULES_TDC = "TDC";
@@ -197,7 +204,7 @@ public interface TdcProperties {
   String TERRAIN_MARSH = "Marsh";
   String TERRAIN_HILL = "Hill";
   String TERRAIN_FLOODED = "Flooded";
-
+  String KEIL_TELEPHONE_COUNT = "KeilTelephoneCount"; // How many units with active telephones is Keil leader currently stacked with
   // TINIAN
   String TERRAIN_RUNWAY = "Runway";
   String TERRAIN_SUGAR_CANE = "Sugar Cane";

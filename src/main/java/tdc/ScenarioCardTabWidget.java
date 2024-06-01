@@ -20,6 +20,8 @@
 package tdc;
 
 import java.awt.Component;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -29,6 +31,8 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -130,6 +134,22 @@ public class ScenarioCardTabWidget extends Widget implements ChangeListener, Pro
         tab.setSelectedIndex(0);
       }
       stateChanged(null);
+      tab.addAncestorListener(new AncestorListener() {
+        @Override
+        public void ancestorAdded(AncestorEvent event) {
+          updateVisibility();
+        }
+
+        @Override
+        public void ancestorRemoved(AncestorEvent event) {
+
+        }
+
+        @Override
+        public void ancestorMoved(AncestorEvent event) {
+
+        }
+      });
     }
     return tab;
   }
@@ -180,21 +200,25 @@ public class ScenarioCardTabWidget extends Widget implements ChangeListener, Pro
         Iterator<Board> it = wm.getBoards().iterator();
         if (!it.hasNext()) {
           // Too Early, no boards loaded yet
-          return;
-        }
-        if (UnitInfo.isCreteRules()) {
-          final String division = (String) wm.getProperty(TdcProperties.MAP_DIVISION);
-          final String useMap = (String) GameModule.getGameModule().getProperty("Used-"+division);
-
-          tabVisibility[i] = ! "false".equals(useMap);
+          if (i == 0) {
+            return;
+          }
         }
         else {
-          names[i] = it.next().getAttributeValueString(Board.IMAGE);
-          if (names[i] == null) {
-             tabVisibility[i] = true;
+          if (UnitInfo.isCreteRules()) {
+            final String division = (String) wm.getProperty(TdcProperties.MAP_DIVISION);
+            final String useMap = (String) GameModule.getGameModule().getProperty("Used-" + division);
+
+            tabVisibility[i] = !"false".equals(useMap);
           }
           else {
-            tabVisibility[i] = !names[i].contains("unused");
+            names[i] = it.next().getAttributeValueString(Board.IMAGE);
+            if (names[i] == null) {
+              tabVisibility[i] = true;
+            }
+            else {
+              tabVisibility[i] = !names[i].contains("unused");
+            }
           }
         }
       }

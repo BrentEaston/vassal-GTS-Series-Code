@@ -365,7 +365,7 @@ public class TdcCounterDetailViewer extends AbstractConfigurable implements Draw
         if (hover != null) {
           final JTextArea text = new JTextArea();
           final int textWidth = 250;
-          final int textHeight = 100;
+          final int textHeight = hover.length() < 200 ? 100 : hover.length() / 2;
           text.setText(hover);
           text.setLineWrap(true);
           text.setWrapStyleWord(true);
