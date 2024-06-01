@@ -296,32 +296,50 @@ public class CommandRangeChecker {
         return false;
       }
 
-
-
       // Non-leader with telephone not cut has telephone regardless of terrain
         return true;
 
     }
     // In Utah:
     // Only units of the 709 Division with a Telephone symbol have Telephone Capability, as long as lines are not cut.
-    // Only Leader Oberst Keil has Telephone, but only if stacked with another unit with Telephone Capability.
+    // and Leader Keil is stacked with a telephone unit with uncut lines.
+    // Units belonging to KG Keil also have Telephone if stacked with another unit with Telephone Capability (assuming Keil has telephone capability).
+    // In the 2 Beach scenarios, 709 telephone units do not need Keil to be on the board.
     else if (TdcProperties.DIVISION_709.equals(division)) {
-      // Unit must have Telephone capability
-      if (!hasTelephone) {
+
+      boolean keilHasPhone = false;
+
+      // If Keil isn't stacked with an uncut phone unit, no-one has phone capability
+
+      // Special case, If its the 2 beach scenarios and Keil is not the map, then he is assumed to have phone capability
+      final String board = (String) piece.getProperty(BasicPiece.CURRENT_BOARD);
+      if (TdcProperties.BOARD_UTAH_BEACH1.equals(board) || TdcProperties.BOARD_UTAH_BEACH2.equals(board)) {
+        keilHasPhone = !isKeilOnMap(piece.getMap());
+      }
+
+      // Keil is on map, so checked he is stacked with a unit with phone capability
+      if (!keilHasPhone) {
+        final String keilPhoneCount = (String) piece.getProperty(TdcProperties.KEIL_TELEPHONE_COUNT);
+        keilHasPhone = (keilPhoneCount != null & !"0".equals(keilPhoneCount));
+      }
+
+      // If Keil has no phone capability, then effectively, no 709 units have phone capability
+      if (!keilHasPhone) {
         return false;
       }
 
-      // Check if Telephone has been cut
-      if (isTelephoneCut(piece)) {
-        return false;
+      // Units that actually have a Telephone, just report current state of lines.
+      if (hasTelephone) {
+        return !isTelephoneCut(piece);
       }
 
-      // Non-leader with telephone not cut has telephone regardless of terrain
-      if (!isLeader) {
-        return true;
+      // All other 709 pieces other than KG Keil have no telephone capability
+      final String formation = piece.getProperty(TdcProperties.BASE_FORMATION) + "";
+      if (!TdcProperties.FORMATION_KEIL.equals(formation)) {
+        return false;
       }
       
-
+      // KG Keil pieces have telephone capability if stacked with another unit that has active telephone capability
       final Stack stack = piece.getParent();
       for (Iterator<GamePiece> i = stack.getPiecesIterator(); i.hasNext();) {
         final GamePiece p = i.next();
@@ -341,14 +359,26 @@ public class CommandRangeChecker {
     return false;
   }
 
+  public boolean isKeilOnMap(Map map) {
+    for (final GamePiece piece : map.getPieces()) {
+      if (piece instanceof Stack) {
+        for (final GamePiece p : ((Stack) piece).asList()) {
+          if (TdcProperties.LEADER.equals(p.getProperty(TdcProperties.TYPE)) && TdcProperties.FORMATION_KEIL.equals(p.getProperty(TdcProperties.FORMATION))) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
   public boolean isTelephoneCut(GamePiece piece) {
-    // Return true if Phone cut set in piece or 8th nue or later Check if the specific piece has the phone cut or
+    // Return true if Phone cut set in piece or 8th June or later Check if the specific piece has the phone cut or
     // if it is 8jun 0700 or later
     if ("2".equals(piece.getProperty(TdcProperties.LAYER_TELEPHONE + "_Level"))) {
       return true;
     }
     final String date = (String) GameModule.getGameModule().getProperty(TdcProperties.DATE);
-    if (("June 6th".equals(date)) || ("June 7th".equals(date)) || ("June 7th".equals(date))) {
+    if (("June 5th".equals(date)) || ("June 6th".equals(date)) || ("June 7th".equals(date))) {
       return false;
     }
     return true;
