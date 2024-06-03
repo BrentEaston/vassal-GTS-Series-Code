@@ -35,10 +35,16 @@ import VASSAL.configure.IntConfigurer;
  */
 public class OpacityConfigurer extends IntConfigurer {
 
+    final private boolean showTitle;
+
     public OpacityConfigurer(String key, String name, int val) {
-      super(key, name, val);
+      this (key, name, val, true);
     }
-    
+
+    public OpacityConfigurer(String key, String name, int val, boolean showTitle) {
+      super(key, name, val);
+      this.showTitle = showTitle;
+    }
     public void setValue(int i) {
       setValue(Integer.valueOf(i));
     }
@@ -47,7 +53,7 @@ public class OpacityConfigurer extends IntConfigurer {
 
       final JSlider slider = new JSlider(JSlider.HORIZONTAL,0,100,getIntValue(100));
 
-      final Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+      final Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
       labelTable.put(0, new JLabel("Transparent") );
       labelTable.put(100, new JLabel("Opaque") );
 
@@ -55,14 +61,13 @@ public class OpacityConfigurer extends IntConfigurer {
       slider.setPaintTicks(true);
       slider.setLabelTable(labelTable);
       slider.setPaintLabels(true);
-      slider.setBorder(javax.swing.BorderFactory.createTitledBorder(name));
-      slider.addChangeListener(new ChangeListener() {
-        public void stateChanged(ChangeEvent e) {
-          final JSlider source = (JSlider)e.getSource();
-          if (!source.getValueIsAdjusting()) {    
-            setValue(source.getValue());
-          }
-        }});
+      slider.setBorder(javax.swing.BorderFactory.createTitledBorder(showTitle ? name : ""));
+      slider.addChangeListener(e -> {
+        final JSlider source = (JSlider)e.getSource();
+        if (!source.getValueIsAdjusting()) {
+          setValue(source.getValue());
+        }
+      });
 
       return slider;
     }

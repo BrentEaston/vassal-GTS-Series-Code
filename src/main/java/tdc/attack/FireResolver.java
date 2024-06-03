@@ -156,7 +156,7 @@ public class FireResolver {
     buttonConfig = new StringEnumConfigurer(ROLL_BUTTON, "Which Dice Roll button?", null);
     buttonConfig.setValidValues(new String[] {BUTTON_ROLL, BUTTON_USE, BUTTON_REPORT, BUTTON_SELECT});
     buttonConfig.setValue(BUTTON_SELECT);
-    GameModule.getGameModule().getPrefs().addOption(AttackWizard.PREF_TAB, buttonConfig);
+    GameModule.getGameModule().getPrefs().addOption(TdcProperties.PREF_TAB, buttonConfig);
 
   }
   

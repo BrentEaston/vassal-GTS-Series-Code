@@ -22,17 +22,30 @@ import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static java.lang.Math.round;
 
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
+import java.util.Map;
 
+import VASSAL.build.GameModule;
 import VASSAL.build.module.map.boardPicker.Board;
 import VASSAL.build.module.map.boardPicker.board.HexGrid;
 import VASSAL.configure.AutoConfigurer;
+import VASSAL.preferences.Prefs;
+import tdc.TdcProperties;
 
 /**
  * Subclass of HexGrid supporting Terrain
@@ -42,10 +55,19 @@ public class TerrainHexGrid extends HexGrid {
 
   protected TerrainHexGridEditor gridEditor;
   protected TerrainMap terrainMap = null;
-  protected HashMap<Point, Area> shapeCache = new HashMap<Point, Area>();
+  protected HashMap<Point, Area> shapeCache = new HashMap<>();
 
+  protected boolean gridEditingInProgress = false;
   public TerrainHexGrid() {
     super();
+  }
+
+  public boolean isGridEditingInProgress() {
+    return gridEditingInProgress;
+  }
+
+  public void setGridEditingInProgress(boolean gridEditingInProgress) {
+    this.gridEditingInProgress = gridEditingInProgress;
   }
 
   public Board getBoard() {
@@ -351,6 +373,7 @@ public class TerrainHexGrid extends HexGrid {
    * Override editGrid() to use the new Terrain GridEditor
    */
   public void editGrid() {
+    setGridEditingInProgress(true);
     gridEditor = new TerrainHexGridEditor(this);
     gridEditor.setVisible(true);
     // Local variables may have been updated by GridEditor so refresh
@@ -522,4 +545,106 @@ public class TerrainHexGrid extends HexGrid {
     }
   }
 
+  @Override
+  public boolean isVisible() {
+    final boolean vis = super.isVisible();
+    if (isGridEditingInProgress()) {
+      return vis;
+    }
+    return true;
+  }
+
+
+  @Override
+  public void draw(Graphics g, Rectangle bounds, Rectangle visibleRect, double zoom, boolean reversed) {
+    super.draw(g, bounds, visibleRect, zoom, reversed);
+    highlightTerrain(g, visibleRect, zoom);
+  }
+
+  @Override
+  public void forceDraw(Graphics g, Rectangle bounds, Rectangle visibleRect, double zoom, boolean reversed) {
+    super.forceDraw(g, bounds, visibleRect, zoom, reversed);
+  }
+
+
+  /*
+    Grids are only drawn once per game per zoom level, and cached into the Tiles, so not bothering to over-optimize.    
+   */
+  public void highlightTerrain(Graphics g, Rectangle visibleRect, double zoom) {
+    final Prefs prefs = GameModule.getGameModule().getPrefs();
+
+    final boolean streamHighlight = "true".equals(prefs.getStoredValue(TdcProperties.TERRAIN_STREAM + TerrainHighlightMenu.HIGHLIGHT));
+    final boolean riverHighlight = "true".equals(prefs.getStoredValue(TdcProperties.TERRAIN_RIVER + TerrainHighlightMenu.HIGHLIGHT));
+    final boolean crestHighlight = "true".equals(prefs.getStoredValue(TdcProperties.TERRAIN_CREST + TerrainHighlightMenu.HIGHLIGHT));
+    final boolean ridgeHighlight = "true".equals(prefs.getStoredValue(TdcProperties.TERRAIN_RIDGE + TerrainHighlightMenu.HIGHLIGHT));
+
+    final Color streamColor = (Color) prefs.getValue(TdcProperties.TERRAIN_STREAM + "Color");
+    final Color riverColor = (Color) prefs.getValue(TdcProperties.TERRAIN_RIVER + "Color");
+    final Color crestColor = (Color) prefs.getValue(TdcProperties.TERRAIN_CREST + "Color");
+    final Color ridgeColor = (Color) prefs.getValue(TdcProperties.TERRAIN_RIDGE + "Color");
+
+    if (streamHighlight) {
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_STREAM);
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_CREST_STREAM, crestHighlight ? null : streamColor);
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_RIDGE_STREAM, ridgeHighlight ? null : streamColor);
+    }
+
+    if (riverHighlight) {
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_RIVER);
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_CREST_RIVER, crestHighlight ? null : riverColor);
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_RIDGE_RIVER, ridgeHighlight ? null : riverColor);
+    }
+
+    if (ridgeHighlight) {
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_RIDGE);
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_RIDGE_STREAM, streamHighlight ? null : ridgeColor);
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_RIDGE_RIVER,  riverHighlight ? null : ridgeColor);
+    }
+
+    if (crestHighlight) {
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_CREST);
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_CREST_STREAM, streamHighlight ? null : crestColor);
+      highlightEdges(g, visibleRect, zoom, TdcProperties.TERRAIN_CREST_RIVER,  riverHighlight ? null : crestColor);
+    }
+
+  }
+
+  final Map<String, GeneralPath> polys = new HashMap<>();
+
+  public void highlightEdges (Graphics g, Rectangle visibleRect, double zoom, String terrainName) {
+    highlightEdges(g, visibleRect, zoom, terrainName, null);
+  }
+
+  public void highlightEdges (Graphics g, Rectangle visibleRect, double zoom, String terrainName, Color overrideColor) {
+    final Graphics2D g2 = (Graphics2D) g;
+
+    final Color oldColor = g2.getColor();
+    final Composite oldComposite = g2.getComposite();
+    final Shape oldClip = g2.getClip();
+    final Stroke oldStroke = g2.getStroke();
+
+    final Prefs prefs = GameModule.getGameModule().getPrefs();
+    GeneralPath poly = polys.get(terrainName);
+    if (poly == null) {
+      poly = getTerrainMap().getEdgePoly(terrainName);
+      polys.put(terrainName, poly);
+    }
+    if (poly == null) return;
+
+    final Shape zoomed = poly.createTransformedShape(AffineTransform.getScaleInstance(zoom, zoom));
+    final Color color = overrideColor == null ? (Color) prefs.getValue(terrainName + "Color") : overrideColor;
+    final float transparency = ((int) prefs.getValue(terrainName + "Transparency")) / 100.0f;
+
+    g2.setClip(visibleRect);
+    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency));
+    g2.setColor(color);
+    g2.setStroke(new BasicStroke(8.0f * (float) zoom, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    g2.draw(zoomed);
+
+    g2.setComposite(oldComposite);
+    g2.setColor(oldColor);
+    g2.setClip(oldClip);
+    g2.setStroke(oldStroke);
+
+  }
 }

@@ -350,19 +350,19 @@ public class WizardThread extends AbstractConfigurable implements MouseListener,
     GameModule.getGameModule().addCommandEncoder(this);
 
     ridgeColorConfig = new ColorConfigurer(RIDGE_COLOR, "Blocking Ridge Color", Color.ORANGE);
-    GameModule.getGameModule().getPrefs().addOption(AttackWizard.PREF_TAB, ridgeColorConfig);
+    GameModule.getGameModule().getPrefs().addOption(TdcProperties.PREF_TAB, ridgeColorConfig);
 
     crestColorConfig = new ColorConfigurer(CREST_COLOR, "Blocking Crest Color", Color.YELLOW);
-    GameModule.getGameModule().getPrefs().addOption(AttackWizard.PREF_TAB, crestColorConfig);
+    GameModule.getGameModule().getPrefs().addOption(TdcProperties.PREF_TAB, crestColorConfig);
 
     blockColorConfig = new ColorConfigurer(BLOCK_COLOR, "Blocking Hex Color", Color.RED);
-    GameModule.getGameModule().getPrefs().addOption(AttackWizard.PREF_TAB, blockColorConfig);
+    GameModule.getGameModule().getPrefs().addOption(TdcProperties.PREF_TAB, blockColorConfig);
 
     possibleColorConfig = new ColorConfigurer(POSSIBLE_COLOR, "Possibly Blocking Hex Color", Color.PINK);
-    GameModule.getGameModule().getPrefs().addOption(AttackWizard.PREF_TAB, possibleColorConfig);
+    GameModule.getGameModule().getPrefs().addOption(TdcProperties.PREF_TAB, possibleColorConfig);
 
     blocksStartShowingConfig = new BooleanConfigurer(BLOCKS_START_SHOWING, "Blocking Terrain starts showing (Ctrl to toggle)?", true);
-    GameModule.getGameModule().getPrefs().addOption(AttackWizard.PREF_TAB, blocksStartShowingConfig);
+    GameModule.getGameModule().getPrefs().addOption(TdcProperties.PREF_TAB, blocksStartShowingConfig);
   }
 
   public Color getRidgeColor() {
