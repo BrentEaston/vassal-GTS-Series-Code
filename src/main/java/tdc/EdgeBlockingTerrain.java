@@ -61,7 +61,7 @@ public class EdgeBlockingTerrain extends BlockingTerrain {
       
       final double os_scale = Info.getSystemScaling();
     
-      if (terrainName.equals(TdcProperties.RIDGE)) {
+      if (terrainName.equals(TdcProperties.TERRAIN_RIDGE)) {
         g2.setColor(ridgeColor);
       }
       else {

@@ -29,6 +29,8 @@ public interface TdcProperties {
 
   boolean DEBUG = false;            // Debug Mode - Mouse over viewer shows ratings
 
+  String PREF_TAB = "Grand Tactical Series";
+
   String STEP = "Step";            // Step Count Marker
   String ACTIVE = "Active";        // Unit can be Activated Marker
   String
@@ -91,8 +93,14 @@ public interface TdcProperties {
   String SUNKEN_RAILROAD = "Sunken Railroad";
   String SECTOR = "Sector";
   String OVERLAY = "Overlay";
-  String CREST = "Crest";
-  String RIDGE = "Ridge";
+  String TERRAIN_CREST = "Crest";
+  String TERRAIN_RIDGE = "Ridge";
+  String TERRAIN_STREAM = "Stream";
+  String TERRAIN_RIVER = "River";
+  String TERRAIN_CREST_STREAM = "CrestAndStream";
+  String TERRAIN_CREST_RIVER = "CrestAndRiver";
+  String TERRAIN_RIDGE_STREAM = "RidgeAndStream";
+  String TERRAIN_RIDGE_RIVER = "RidgeAndRiver";
 
   String ARMY_GERMAN = "German";
   String ARMY_ALLIED = "Allied";
@@ -340,4 +348,3 @@ public interface TdcProperties {
 
 
 }
-

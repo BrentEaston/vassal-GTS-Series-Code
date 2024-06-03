@@ -47,7 +47,11 @@ public class MapTerrain extends AbstractConfigurable {
   public String getTerrainName() {
     return getConfigureName();
   }
-  
+
+  public void setColor(Color color) {
+    this.color = color;
+  }
+
   public Color getColor() {
     return color;
   }
@@ -80,7 +84,7 @@ public class MapTerrain extends AbstractConfigurable {
       if (value instanceof String) {
         value = ColorConfigurer.stringToColor((String) value);
       }
-      color = (Color) value;
+      setColor((Color) value);
     }
     else if (BLOCKING.equals(key)) {
       if (value instanceof String) {

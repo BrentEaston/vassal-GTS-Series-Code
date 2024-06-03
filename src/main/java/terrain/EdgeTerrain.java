@@ -18,6 +18,14 @@
  */
 package terrain;
 
+import VASSAL.build.Buildable;
+import VASSAL.build.GameModule;
+import VASSAL.configure.ColorConfigurer;
+import VASSAL.preferences.Prefs;
+
+import tdc.TdcProperties;
+
+
 /**
  * EdgeTerrain Definition. Edge Terrain runs along the each hex edge.
  *
@@ -32,5 +40,21 @@ public class EdgeTerrain extends MapTerrain {
     return "Edge Terrain";
   }
 
+  @Override
+  public void addTo(Buildable b) {
+    super.addTo(b);
+    final String terrainName = getConfigureName();
+    if (terrainName != null) {
+      final Prefs prefs = GameModule.getGameModule().getPrefs();
+
+      final String colorKey = terrainName + "Color";
+      final ColorConfigurer colorConfig = new ColorConfigurer(colorKey, terrainName + " Highlight Color", getColor());
+      prefs.addOption(TdcProperties.PREF_TAB, colorConfig);
+
+      final String transparencyKey = terrainName + "Transparency";
+      final OpacityConfigurer transparencyConfig = new OpacityConfigurer(transparencyKey, terrainName + " Highlight Transparency", 60, false);
+      prefs.addOption(TdcProperties.PREF_TAB, transparencyConfig);
+    }
+  }
 
 }

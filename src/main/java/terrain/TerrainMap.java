@@ -209,11 +209,22 @@ public class TerrainMap {
       return null;
     }
     GeneralPath poly = edgePoly.get(terrainType);
-    if (poly == null) {
+    if (poly == null && getEdgeCount(terrainType) > 0) {
       rebuildEdgeAreas();
       poly = edgePoly.get(terrainType);
     }
     return poly;
+  }
+
+  public int getEdgeCount(String terrainType) {
+    int count = 0;
+    for (TerrainHex hex : getAllHexTerrain()) {
+      final String t = hex.getTerrain().getConfigureName();
+      if (t.equals(terrainType)) {
+        count++;
+      }
+    }
+    return count;
   }
   
   public GeneralPath getLinePoly(String terrainType) {

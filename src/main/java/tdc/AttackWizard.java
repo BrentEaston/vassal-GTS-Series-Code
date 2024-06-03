@@ -52,8 +52,6 @@ import java.util.List;
 public class AttackWizard extends AbstractConfigurable implements Drawable, MouseListener, GameComponent, CommandEncoder, UniqueIdManager.Identifyable, Wizard {
 
   public static final String ATTACK_WIZARD_COMMAND = "Awiz\t";
-  public static final String PREF_TAB = "Grand Tactical Series";
-
   public static final String WIZARD_OPEN = "Open";
   public static final String WIZARD_BEACH = "Beach";
   public static final String WIZARD_SPECIAL = "Special";
@@ -753,7 +751,7 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
     myResolver = new FireResolver(this);
 
     autoCloseConfig = new BooleanConfigurer(AUTO_CLOSE, "Auto-close Attack Wizard?", true);
-    GameModule.getGameModule().getPrefs().addOption(PREF_TAB, autoCloseConfig);
+    GameModule.getGameModule().getPrefs().addOption(TdcProperties.PREF_TAB, autoCloseConfig);
   }
 
   public void removeFrom(Buildable b) {

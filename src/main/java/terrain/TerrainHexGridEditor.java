@@ -471,6 +471,7 @@ public class TerrainHexGridEditor extends GridEditor implements ActionListener, 
     myGrid.setEdgesLegal(saveSnapToEdges);
     myGrid.setCornersLegal(saveSnapToCorners);
     setVisible(false);
+    myGrid.setGridEditingInProgress(false);
   }
 
   public void rebuild() {
