@@ -94,6 +94,7 @@ public class TdcLeader extends Decorator implements EditablePiece {
   protected static final String NONE_ELIGIBLE = "None Eligible";
   protected static final String ACTIVATION_LIMIT_REACHED = "Activation Limit Reached";
   protected static final String ACTIVATE_INDEPENDENTS = "Activate Independents";
+  protected static final String NOT_ACTIVE = "Leader Not Activated";
 
   protected static final Font FONT_LG = new Font("Dialog", Font.BOLD, 16);
 
@@ -266,6 +267,15 @@ public class TdcLeader extends Decorator implements EditablePiece {
     final KeyCommand infoKeyCommand = new KeyCommand(infoCommand, infoKey, this);
     final KeyCommand flipKeyCommand = new KeyCommand(flipCommand, flipKey, this);
 
+    final boolean activated = "2".equals(Decorator.getOutermost(piece).getProperty("Active_Level"));
+    if (!activated) {
+      KeyCommand c = new KeyCommand(NOT_ACTIVE, (NamedKeyStroke) null, this);
+      c.setEnabled(false);
+      sub.setCommands(new String[] { NOT_ACTIVE });
+      keyCommands = new KeyCommand[] { flipKeyCommand, infoKeyCommand, c, sub };
+      return keyCommands;
+    }
+
     // Activation Limit reached?
     if (getActivateCount() <= 0) {
       KeyCommand c = new KeyCommand(ACTIVATION_LIMIT_REACHED, (NamedKeyStroke) null, this);
@@ -280,12 +290,6 @@ public class TdcLeader extends Decorator implements EditablePiece {
     c.setEnabled(false);
     sub.setCommands(new String[] { NONE_ELIGIBLE });
     keyCommands = new KeyCommand[] { flipKeyCommand, infoKeyCommand, c, sub };
-
-    // Only available if the Leader is activated
-    boolean activated = "2".equals(Decorator.getOutermost(piece).getProperty("Active_Level"));
-    if (!activated) {
-      return new KeyCommand[] { flipKeyCommand, infoKeyCommand };
-    }
 
     // If this is Crete and the Leader is German, then all independents in range of activated KG Leaders
     // from the same division are also eligible to be activated.
@@ -310,8 +314,10 @@ public class TdcLeader extends Decorator implements EditablePiece {
     // - Same Division
     // - Independent
     // - Not currently activated
+    // - Note - In D-DAY, 'Independent' independents (Division=ind) are also candidates
     units.clear();
     final String myDivision = (String) piece.getProperty(TdcProperties.DIVISION);
+    final String myArmy  = (String) piece.getProperty(TdcProperties.ARMY);
 
     MapGrid grid = null;
     final Point pos = getPosition();
@@ -335,7 +341,8 @@ public class TdcLeader extends Decorator implements EditablePiece {
           final String type = (String) p.getProperty(TdcProperties.TYPE);
           if (TdcProperties.TYPE_UNIT.equals(type)) {
             final String division = (String) p.getProperty(TdcProperties.DIVISION);
-            if (myDivision.equals(division)) {
+            final String army = (String) p.getProperty(TdcProperties.ARMY);
+            if (myArmy.equals(army) && (myDivision.equals(division) || UnitInfo.isTgdRules() & TdcProperties.DIVISION_INDEPENDENT.equals(division))) {
               if ("true".equals(p.getProperty(TdcProperties.IS_INDEPENDENT))) {
                 if ("1".equals(p.getProperty("Active_Level"))) {
                   final int range = grid.range(pos, p.getPosition());

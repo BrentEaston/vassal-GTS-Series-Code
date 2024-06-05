@@ -56,6 +56,7 @@ public interface TdcProperties {
   String BASE_FORMATION = "MyFormation"; // Base Formation Marker
   String DIVISION = "Division";   // Owning Division Marker
   String DIVISION2 = "Division2";   // Secondary command Division Marker
+  String DIVISION_INDEPENDENT = "ind"; // D-Day Independents with no onwing Division
 
   String TYPE = "Type";         // Unit Type Marker
   String BRIDGE = "Bridge";     // Bridge Type
