@@ -50,10 +50,6 @@ public class EdgeTerrain extends MapTerrain {
       final String colorKey = terrainName + "Color";
       final ColorConfigurer colorConfig = new ColorConfigurer(colorKey, terrainName + " Highlight Color", getColor());
       prefs.addOption(TdcProperties.PREF_TAB, colorConfig);
-
-      final String transparencyKey = terrainName + "Transparency";
-      final OpacityConfigurer transparencyConfig = new OpacityConfigurer(transparencyKey, terrainName + " Highlight Transparency", 60, false);
-      prefs.addOption(TdcProperties.PREF_TAB, transparencyConfig);
     }
   }
 

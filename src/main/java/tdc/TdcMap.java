@@ -159,6 +159,9 @@ public class TdcMap extends Map {
     terrainMap = null;
     if (starting) {
       buildLOSMap();
+      for (final Board board : boards) {
+        board.setCacheGrid(false);
+      }
     }
   }
   

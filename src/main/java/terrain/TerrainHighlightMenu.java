@@ -3,9 +3,12 @@ package terrain;
 import VASSAL.build.Buildable;
 import VASSAL.build.GameModule;
 import VASSAL.build.module.ToolbarMenu;
+import VASSAL.build.module.Map;
 import VASSAL.configure.BooleanConfigurer;
+import VASSAL.configure.StringEnumConfigurer;
 import VASSAL.preferences.Prefs;
 import VASSAL.tools.LaunchButton;
+
 import net.miginfocom.swing.MigLayout;
 import tdc.TdcProperties;
 
@@ -23,7 +26,9 @@ import java.awt.image.BufferedImage;
 
 public class TerrainHighlightMenu extends ToolbarMenu {
 
-  final static String HIGHLIGHT = "Highlight";
+  public final static String HIGHLIGHT = "Highlight";
+  public final static String HIGHLIGHT_STROKE_WIDTH = "highlightSrokeWidth";
+  public final static String HIGHLIGHT_STROKE_TRANSPARENCY = "highlightSrokeTransparency";
   JDialog dialog;
 
   @Override
@@ -32,17 +37,26 @@ public class TerrainHighlightMenu extends ToolbarMenu {
 
     final Prefs prefs = GameModule.getGameModule().getPrefs();
 
-    final BooleanConfigurer streamConfig = new BooleanConfigurer(TdcProperties.TERRAIN_STREAM + HIGHLIGHT, "");
-    prefs.addOption(streamConfig);
+    final BooleanConfigurer streamConfig = new BooleanConfigurer(TdcProperties.TERRAIN_STREAM + HIGHLIGHT, null);
+    prefs.addOption(null, streamConfig);
 
-    final BooleanConfigurer riverConfig = new BooleanConfigurer(TdcProperties.TERRAIN_RIVER + HIGHLIGHT, "");
-    prefs.addOption(riverConfig);
+    final BooleanConfigurer riverConfig = new BooleanConfigurer(TdcProperties.TERRAIN_RIVER + HIGHLIGHT, null);
+    prefs.addOption(null, riverConfig);
 
-    final BooleanConfigurer crestConfig = new BooleanConfigurer(TdcProperties.TERRAIN_CREST + HIGHLIGHT, "");
-    prefs.addOption(crestConfig);
+    final BooleanConfigurer crestConfig = new BooleanConfigurer(TdcProperties.TERRAIN_CREST + HIGHLIGHT, null);
+    prefs.addOption(null, crestConfig);
 
-    final BooleanConfigurer ridgeConfig = new BooleanConfigurer(TdcProperties.TERRAIN_RIDGE + HIGHLIGHT, "");
-    prefs.addOption(ridgeConfig);
+    final BooleanConfigurer ridgeConfig = new BooleanConfigurer(TdcProperties.TERRAIN_RIDGE + HIGHLIGHT, null);
+    prefs.addOption(null, ridgeConfig);
+
+    final StringEnumConfigurer strokeConfig = new StringEnumConfigurer(HIGHLIGHT_STROKE_WIDTH, "Terrain Highlight Stroke Width", new String[] {"1", "2", "3", "4", "5", "6", "7", "8"});
+    strokeConfig.setValue("6");
+    strokeConfig.addPropertyChangeListener(e -> refresh());
+    prefs.addOption(TdcProperties.PREF_TAB, strokeConfig);
+
+    final OpacityConfigurer transparencyConfig = new OpacityConfigurer(HIGHLIGHT_STROKE_TRANSPARENCY, " Terrain Highlight Transparency", 30, false);
+    transparencyConfig.addPropertyChangeListener(e -> refresh());
+    prefs.addOption(TdcProperties.PREF_TAB, transparencyConfig);
 
   }
 
@@ -64,8 +78,6 @@ public class TerrainHighlightMenu extends ToolbarMenu {
     dialog.setTitle("Terrain Highlighting");
     dialog.setLayout(new MigLayout("", "[]rel[]"));
     dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-
-    dialog.add(new JLabel("Changes require restart"), "span 2, wrap");
 
     addItem(TdcProperties.TERRAIN_STREAM);
     addItem(TdcProperties.TERRAIN_RIVER);
@@ -106,6 +118,15 @@ public class TerrainHighlightMenu extends ToolbarMenu {
   protected void setPref(String item, boolean state) {
     final String key = item + HIGHLIGHT;
     GameModule.getGameModule().getPrefs().setValue(key, state);
+    refresh();
+  }
+
+  protected void refresh() {
+    // Repaint the main map after any change
+    final Map map = Map.getMapById("Map");
+    if (map != null) {
+      map.repaint();
+    }
   }
 }
 

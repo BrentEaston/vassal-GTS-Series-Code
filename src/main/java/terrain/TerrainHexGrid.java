@@ -40,6 +40,7 @@ import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
+import VASSAL.build.Buildable;
 import VASSAL.build.GameModule;
 import VASSAL.build.module.map.boardPicker.Board;
 import VASSAL.build.module.map.boardPicker.board.HexGrid;
@@ -573,10 +574,10 @@ public class TerrainHexGrid extends HexGrid {
   public void highlightTerrain(Graphics g, Rectangle visibleRect, double zoom) {
     final Prefs prefs = GameModule.getGameModule().getPrefs();
 
-    final boolean streamHighlight = "true".equals(prefs.getStoredValue(TdcProperties.TERRAIN_STREAM + TerrainHighlightMenu.HIGHLIGHT));
-    final boolean riverHighlight = "true".equals(prefs.getStoredValue(TdcProperties.TERRAIN_RIVER + TerrainHighlightMenu.HIGHLIGHT));
-    final boolean crestHighlight = "true".equals(prefs.getStoredValue(TdcProperties.TERRAIN_CREST + TerrainHighlightMenu.HIGHLIGHT));
-    final boolean ridgeHighlight = "true".equals(prefs.getStoredValue(TdcProperties.TERRAIN_RIDGE + TerrainHighlightMenu.HIGHLIGHT));
+    final boolean streamHighlight = (Boolean) prefs.getValue(TdcProperties.TERRAIN_STREAM + TerrainHighlightMenu.HIGHLIGHT);
+    final boolean riverHighlight = (Boolean) prefs.getValue(TdcProperties.TERRAIN_RIVER + TerrainHighlightMenu.HIGHLIGHT);
+    final boolean crestHighlight = (Boolean) prefs.getValue(TdcProperties.TERRAIN_CREST + TerrainHighlightMenu.HIGHLIGHT);
+    final boolean ridgeHighlight = (Boolean) prefs.getValue(TdcProperties.TERRAIN_RIDGE + TerrainHighlightMenu.HIGHLIGHT);
 
     final Color streamColor = (Color) prefs.getValue(TdcProperties.TERRAIN_STREAM + "Color");
     final Color riverColor = (Color) prefs.getValue(TdcProperties.TERRAIN_RIVER + "Color");
@@ -609,13 +610,18 @@ public class TerrainHexGrid extends HexGrid {
 
   }
 
-  final Map<String, GeneralPath> polys = new HashMap<>();
-
   public void highlightEdges (Graphics g, Rectangle visibleRect, double zoom, String terrainName) {
     highlightEdges(g, visibleRect, zoom, terrainName, null);
   }
 
   public void highlightEdges (Graphics g, Rectangle visibleRect, double zoom, String terrainName, Color overrideColor) {
+
+    // Find a cached shape for this terrain type and zoom
+    final Shape zoomed = getTerrainShape(terrainName, zoom);
+    if (zoomed == null) {
+      return;
+    }
+
     final Graphics2D g2 = (Graphics2D) g;
 
     final Color oldColor = g2.getColor();
@@ -624,21 +630,15 @@ public class TerrainHexGrid extends HexGrid {
     final Stroke oldStroke = g2.getStroke();
 
     final Prefs prefs = GameModule.getGameModule().getPrefs();
-    GeneralPath poly = polys.get(terrainName);
-    if (poly == null) {
-      poly = getTerrainMap().getEdgePoly(terrainName);
-      polys.put(terrainName, poly);
-    }
-    if (poly == null) return;
 
-    final Shape zoomed = poly.createTransformedShape(AffineTransform.getScaleInstance(zoom, zoom));
     final Color color = overrideColor == null ? (Color) prefs.getValue(terrainName + "Color") : overrideColor;
-    final float transparency = ((int) prefs.getValue(terrainName + "Transparency")) / 100.0f;
+    final float transparency = ((int) prefs.getValue(TerrainHighlightMenu.HIGHLIGHT_STROKE_TRANSPARENCY)) / 100.0f;
+    final int strokeWidth = Integer.parseInt((String) prefs.getValue(TerrainHighlightMenu.HIGHLIGHT_STROKE_WIDTH));
 
     g2.setClip(visibleRect);
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency));
     g2.setColor(color);
-    g2.setStroke(new BasicStroke(8.0f * (float) zoom, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    g2.setStroke(new BasicStroke(strokeWidth * (float) zoom, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
     g2.draw(zoomed);
 
     g2.setComposite(oldComposite);
@@ -646,5 +646,46 @@ public class TerrainHexGrid extends HexGrid {
     g2.setClip(oldClip);
     g2.setStroke(oldStroke);
 
+  }
+
+  // Handled Terrain edge shape caching
+  private final Map<String, GeneralPath> polys = new HashMap<>();
+  private final Map<Ref, Shape> terrainShapes = new HashMap<>();
+
+  private static class Ref {
+    private final String terrainName;
+    private final double zoom;
+    public Ref (String terrainName, double zoom) {
+      this.terrainName = terrainName;
+      this.zoom = zoom;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (! (obj instanceof Ref)) {
+        return false;
+      }
+      final Ref other = (Ref) obj;
+      return terrainName.equals(other.terrainName) && zoom == other.zoom;
+    }
+  }
+
+  private Shape getTerrainShape(String terrainName, double zoom) {
+    final Ref ref = new Ref(terrainName, zoom);
+    final Shape existing = terrainShapes.get(ref);
+    if (terrainShapes.containsKey(ref)) {
+      // Existing shape already calculated
+      return existing;
+    }
+
+    final GeneralPath poly = polys.computeIfAbsent(terrainName, e -> getTerrainMap().getEdgePoly(terrainName));
+    if (poly == null) return null;
+
+    final Rectangle bounds = getBoard().bounds();
+    final Shape offset = poly.createTransformedShape(AffineTransform.getTranslateInstance(bounds.x, bounds.y));
+    final Shape zoomed = AffineTransform.getScaleInstance(zoom, zoom).createTransformedShape(offset);
+
+    terrainShapes.put(ref, zoomed);
+    return zoomed;
   }
 }
