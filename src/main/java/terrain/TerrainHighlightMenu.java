@@ -37,16 +37,16 @@ public class TerrainHighlightMenu extends ToolbarMenu {
 
     final Prefs prefs = GameModule.getGameModule().getPrefs();
 
-    final BooleanConfigurer streamConfig = new BooleanConfigurer(TdcProperties.TERRAIN_STREAM + HIGHLIGHT, null);
+    final BooleanConfigurer streamConfig = new BooleanConfigurer(TdcProperties.TERRAIN_STREAM + HIGHLIGHT, null, true);
     prefs.addOption(null, streamConfig);
 
-    final BooleanConfigurer riverConfig = new BooleanConfigurer(TdcProperties.TERRAIN_RIVER + HIGHLIGHT, null);
+    final BooleanConfigurer riverConfig = new BooleanConfigurer(TdcProperties.TERRAIN_RIVER + HIGHLIGHT, null, false);
     prefs.addOption(null, riverConfig);
 
-    final BooleanConfigurer crestConfig = new BooleanConfigurer(TdcProperties.TERRAIN_CREST + HIGHLIGHT, null);
+    final BooleanConfigurer crestConfig = new BooleanConfigurer(TdcProperties.TERRAIN_CREST + HIGHLIGHT, null, true);
     prefs.addOption(null, crestConfig);
 
-    final BooleanConfigurer ridgeConfig = new BooleanConfigurer(TdcProperties.TERRAIN_RIDGE + HIGHLIGHT, null);
+    final BooleanConfigurer ridgeConfig = new BooleanConfigurer(TdcProperties.TERRAIN_RIDGE + HIGHLIGHT, null, false);
     prefs.addOption(null, ridgeConfig);
 
     final StringEnumConfigurer strokeConfig = new StringEnumConfigurer(HIGHLIGHT_STROKE_WIDTH, "Terrain Highlight Stroke Width", new String[] {"1", "2", "3", "4", "5", "6", "7", "8"});
