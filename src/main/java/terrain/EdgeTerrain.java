@@ -20,6 +20,7 @@ package terrain;
 
 import VASSAL.build.Buildable;
 import VASSAL.build.GameModule;
+import VASSAL.build.module.Map;
 import VASSAL.configure.ColorConfigurer;
 import VASSAL.preferences.Prefs;
 
@@ -49,7 +50,16 @@ public class EdgeTerrain extends MapTerrain {
 
       final String colorKey = terrainName + "Color";
       final ColorConfigurer colorConfig = new ColorConfigurer(colorKey, terrainName + " Highlight Color", getColor());
+      colorConfig.addPropertyChangeListener(e -> refresh());
       prefs.addOption(TdcProperties.PREF_TAB, colorConfig);
+    }
+  }
+
+  protected void refresh() {
+    // Repaint the main map after any change
+    final Map map = Map.getMapById("Map");
+    if (map != null) {
+      map.repaint();
     }
   }
 
