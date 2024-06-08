@@ -678,8 +678,15 @@ public class TerrainHexGrid extends HexGrid {
       return existing;
     }
 
-    final GeneralPath poly = polys.computeIfAbsent(terrainName, e -> getTerrainMap().getEdgePoly(terrainName));
-    if (poly == null) return null;
+    GeneralPath poly = polys.get(terrainName);
+    if (poly == null && !polys.containsKey(terrainName)) {
+      poly = getTerrainMap().getEdgePoly(terrainName);
+      polys.put(terrainName, poly);
+    }
+    if (poly == null) {
+      terrainShapes.put(ref, null);
+      return null;
+    }
 
     final Rectangle bounds = getBoard().bounds();
     final Shape offset = poly.createTransformedShape(AffineTransform.getTranslateInstance(bounds.x, bounds.y));

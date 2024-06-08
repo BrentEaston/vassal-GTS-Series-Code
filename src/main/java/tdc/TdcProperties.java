@@ -164,7 +164,12 @@ public interface TdcProperties {
   String RULES_UTAH = "2";
   String RULES_OMAHA = "3";
   String RULES_COMBINED = "4";
-  
+
+  String TGD_DAILY_AIR_POWER_CLEAR = "DailyAirPowerClear";
+  String TGD_DAILY_AIR_POWER_OVERCAST = "DailyAirPowerOvercast";
+  String TGD_INTERDICT_LIMIT_CLEAR = "InterdictLimitClear";
+  String TGD_INTERDICT_LIMIT_OVERCAST = "InterdictLimitOvercast";
+
   String SDZ_1AB = "SDZ-1AB";
   String SDZ_52AL = "SDZ-52AL";
   String SDZ_82AB = "SDZ-82AB";

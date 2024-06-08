@@ -23,7 +23,6 @@ import static VASSAL.configure.ComponentLayout.DEFAULT_COMPONENT_COLUMN_CONSTRAI
 import static VASSAL.configure.ComponentLayout.DEFAULT_COMPONENT_LAYOUT_CONSTRAINTS;
 
 import VASSAL.configure.ComponentConfigPanel;
-import VASSAL.counters.TraitLayout;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
@@ -86,7 +85,12 @@ public class TdcScenarioOptions extends Widget {
   protected BooleanOption creteDivfjr2;
   
   protected StringEnumOption subRuleSet;
-  
+
+  protected StringEnumOption airPowerClear;
+  protected StringEnumOption airPowerOvercast;
+  protected StringEnumOption interdictClear;
+  protected StringEnumOption interdictOvercast;
+
   public TdcScenarioOptions() {
     super();
   }
@@ -160,25 +164,45 @@ public class TdcScenarioOptions extends Widget {
         artilleryScatterRule = new BooleanOption("ArtilleryScatterRule", "Report Artillery Scatter Direction on roll of 9");
         ddBox.add(artilleryScatterRule);
 
+        airPowerClear = new StringEnumOption(
+          TdcProperties.TGD_DAILY_AIR_POWER_CLEAR,
+          "Daily Air Power Allocation - Clear",
+          new String[] {"0", "1", "2", "3", "4", "5", "6", "8", "10", "12", "18"});
+        ddBox.add(airPowerClear);
+
+        airPowerOvercast = new StringEnumOption(
+          TdcProperties.TGD_DAILY_AIR_POWER_OVERCAST,
+          "Daily Air Power Allocation - Overcast",
+          new String[] {"0", "1", "2", "3", "4", "5", "6", "8", "10"});
+        ddBox.add(airPowerOvercast);
+
+        interdictClear = new StringEnumOption(
+          TdcProperties.TGD_INTERDICT_LIMIT_CLEAR,
+          "Daily Air Power Interdiction Limit - Clear",
+          new String[] {"0", "1", "2", "3", "4", "5"});
+        ddBox.add(interdictClear);
+
+        interdictOvercast = new StringEnumOption(
+          TdcProperties.TGD_INTERDICT_LIMIT_OVERCAST,
+          "Daily Air Power Interdiction Limit - Overcast",
+          new String[] {"0", "1", "2", "3"});
+        ddBox.add(interdictOvercast);
+
         optionBox.add(ddBox, "growx,push");
 
-        final ComponentPanel sjdBox = new ComponentPanel();
-        sjdBox.addHeading("Sword, Juno, Gold");
+        final ComponentPanel sjgBox = new ComponentPanel();
+        sjgBox.addHeading("Sword, Juno, Gold");
 
         telephoneCommand736 = new BooleanOption("736TelCom", "736 Rgt Command depends only on Phone Lines?");
-        sjdBox.add(telephoneCommand736);
+        sjgBox.add(telephoneCommand736);
 
         attach_22arm = new AttachOption("Attach-22Arm", "22 Arm Brigade are attached to division: ", new String[] { TdcProperties.DIVISION_7TH, TdcProperties.DIVISION_50TH }, "7th-v-50th");
-        sjdBox.add(attach_22arm);
+        sjgBox.add(attach_22arm);
 
         add10toSwordNavalRange = new BooleanOption(TdcProperties.ADD_10_TO_SWORD_NAVAL_RANGE, "+10 hexes to Sword Naval Range?");
-        sjdBox.add(add10toSwordNavalRange);
+        sjgBox.add(add10toSwordNavalRange);
 
-        optionBox.add(sjdBox, "growx,push");
-
-        final ComponentPanel uBox = new ComponentPanel();
-        uBox.addHeading("Utah");
-        optionBox.add(uBox, "growx,push");
+        optionBox.add(sjgBox, "growx,push");
 
       }
 
