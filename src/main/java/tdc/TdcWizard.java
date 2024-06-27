@@ -194,7 +194,7 @@ public class TdcWizard extends Decorator implements EditablePiece {
       
       assaultCommand = new KeyCommand(ASSAULT_COMMAND, assaultKey, Decorator.getOutermost(this));
       assaultCommand.setEnabled(getMap() != null && getMap() instanceof TdcMap && info.canAssault());
-     //  keyCommands.add(assaultCommand);
+      // keyCommands.add(assaultCommand);
     }
 
     // Naval Allied
@@ -704,7 +704,9 @@ public class TdcWizard extends Decorator implements EditablePiece {
 
   public static class Ed implements PieceEditor {
     protected HotKeyConfigurer attackKeyInput;
+    protected HotKeyConfigurer assaultKeyInput;
     protected HotKeyConfigurer infoKeyInput;
+
     protected JPanel controls;
 
     public Ed(TdcWizard p) {
@@ -713,6 +715,9 @@ public class TdcWizard extends Decorator implements EditablePiece {
 
       attackKeyInput = new HotKeyConfigurer(null, "Attack Wizard Key:  ", p.attackKey);
       controls.add(attackKeyInput.getControls());
+
+      assaultKeyInput = new HotKeyConfigurer(null, "Assault Wizard Key:  ", p.assaultKey);
+      controls.add(assaultKeyInput.getControls());
 
       infoKeyInput = new HotKeyConfigurer(null, "Info Key:  ", p.infoKey);
       controls.add(infoKeyInput.getControls());

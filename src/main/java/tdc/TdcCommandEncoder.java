@@ -20,6 +20,7 @@ package tdc;
 
 import VASSAL.counters.BasicPiece;
 import VASSAL.counters.Decorator;
+import VASSAL.counters.Embellishment;
 import VASSAL.counters.GamePiece;
 
 import terrain.TerrainCommandEncoder;
@@ -61,7 +62,13 @@ public class TdcCommandEncoder extends TerrainCommandEncoder {
     }
     else if (type.startsWith(HoverText.ID)) {
       return new HoverText(type, inner);
-    }    
+    }
+    else if (type.startsWith(TerrainMarker.ID)) {
+      return new TerrainMarker(type, inner);
+    }
+    else if (type.startsWith(Embellishment.ID) && type.contains("marker-column-semi.png")) {
+      return new TdcColumnEmbellishment(type, inner);
+    }
     return super.createDecorator(type, inner);
   }
 }

@@ -158,6 +158,8 @@ public interface TdcProperties {
   String RULES_TINIAN = "TINIAN";
   String RULES_CRETE = "CRETE";
   String RULES_AMD = "AMD";
+  String RULES_SAAR = "SAAR";
+  String RULES_BASTOGNE = "BASTOGNE";
   
   String SUB_RULESET = "SubRuleset";
   String RULES_GJS = "1";
@@ -352,5 +354,5 @@ public interface TdcProperties {
   String SUBCLASS_GREEK = "Greek";
   String SUBCLASS_KGR_LEADER = "KgrLeader";
 
-
+  String STANDARD_COLUMN_TYPE = "StandardColumnType"; // Show standard column marker?
 }

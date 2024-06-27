@@ -32,13 +32,16 @@ import VASSAL.counters.GamePiece;
 public class AssaultModel {
 
   protected List<GamePiece> sources;
-  protected List<AssaultInfo> sourceInfos = new ArrayList<AssaultInfo>();
+  protected List<AssaultInfo> sourceInfos = new ArrayList<>();
   protected List<GamePiece> targets;
-  protected List<UnitInfo> targetInfos = new ArrayList<UnitInfo>();
+  protected List<UnitInfo> targetInfos = new ArrayList<>();
   protected AssaultView changeListener;
-  protected int step = 1;
-  protected String[] stepDescriptions = new String[] {"Initialising", "Assault Unit Selection"};
-  protected String[] stepDetails = new String[] {"Initialising", "Select the Units to continue with the Assault."};
+  protected static final int STEP_SELECT = 1;
+  protected static final int STEP_BRAVERY = 2;
+
+  protected int step = STEP_SELECT;
+  protected String[] stepDescriptions = new String[] {"Initialising", "Assault Unit Selection", "Bravery Checks"};
+  protected String[] stepDetails = new String[] {"Initialising", "Select the Units to continue with the Assault.", "Each attacking unit to make a Braveru Check unless no FZ on target hex"};
   protected boolean sourceOverStacked = false;
   protected boolean targetOverStacked = false;
   
@@ -94,11 +97,19 @@ public class AssaultModel {
   public boolean isTargetOverStacked () {
     return targetOverStacked;
   }
-  
+
+
   public int getStep() {
     return step;
   }
-  
+
+  public int nextStep() {
+    if (step == STEP_SELECT) {
+      step = STEP_BRAVERY;
+    }
+    return step;
+  }
+
   public String getStepDescription() {
     return stepDescriptions[step];
   }
@@ -145,7 +156,15 @@ public class AssaultModel {
   public String getSourceAtt (int i) {
     return sourceInfos.get(i).getInfo().getEffectiveFireRating();
   }
-  
+
+  public String getSourceAttColour(int i) {
+    return sourceInfos.get(i).getInfo().getFireColor();
+  }
+
+  public String getSourceAssColour(int i) {
+    return sourceInfos.get(i).getInfo().getAssaultColor();
+  }
+
   public String getSourceAss (int i) {
     return sourceInfos.get(i).getInfo().getEffectiveAssaultRating();
   }
@@ -157,10 +176,23 @@ public class AssaultModel {
   public String getPrimaryAssaultRating (int i) {
     return isDoubleAssault(i) ? getSourceAss(i) : getSourceAtt(i);
   }
-  
-public String getSecondaryAssaultRating (int i) {
+
+  public String getPrimaryAssaultColour (int i) {
+    return isDoubleAssault(i) ? getSourceAssColour(i) : getSourceAttColour(i);
+  }
+
+  public String getSecondaryAssaultRating (int i) {
     return getSourceAss(i);
   }
+
+  public String getSecondaryAssaultColour (int i) {
+    return getSourceAssColour(i);
+  }
+
+  public String getSourceDetails(int i) {
+    return sourceInfos.get(i).getInfo().getDetailSummary();
+  }
+
   class AssaultInfo {
     protected GamePiece piece;
     protected UnitInfo info;

@@ -19,30 +19,6 @@
 
 package tdc;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Window;
-import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-
-import VASSAL.counters.TraitConfigPanel;
-import VASSAL.counters.TraitLayout;
-import net.miginfocom.swing.MigLayout;
 import VASSAL.build.module.documentation.HelpFile;
 import VASSAL.command.Command;
 import VASSAL.configure.BooleanConfigurer;
@@ -56,8 +32,31 @@ import VASSAL.counters.KeyCommand;
 import VASSAL.counters.PieceCloner;
 import VASSAL.counters.PieceEditor;
 import VASSAL.counters.Properties;
-import VASSAL.tools.image.LabelUtils;
+import VASSAL.counters.TraitConfigPanel;
+import VASSAL.counters.TraitLayout;
 import VASSAL.tools.SequenceEncoder;
+import VASSAL.tools.image.LabelUtils;
+
+import net.miginfocom.swing.MigLayout;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Window;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 
 /**
  * Encode all ratings on a counter. Return them in a HashMap when requested.
@@ -125,6 +124,7 @@ public class TdcRatings extends Decorator implements EditablePiece {
   protected static final Font FONT_SML = new Font("Dialog", Font.BOLD, 12);
 
   public static final String ID = "ratings;";
+
   protected KeyCommand[] keyCommands;
   protected String fireRating, tqrRating, assaultRating, fireColour, assaultColour, moveColour,
       defRating, range, moveRating, flakRating;
@@ -324,7 +324,7 @@ public class TdcRatings extends Decorator implements EditablePiece {
       final String flakRating = ratings == null ? null : ratings.get(FLAK_RATING);
       return String.valueOf(flakRating != null && flakRating.length() > 0 && ! flakRating.equals("No"));
     }
-    
+
     return super.getProperty(key);
   }
 
@@ -808,12 +808,15 @@ public class TdcRatings extends Decorator implements EditablePiece {
 
     protected void findImages() {
 
+      final int unitWidth = UnitInfo.getStandardUnitSize();
+      final int halfWidth = unitWidth / 2;
+
       final BasicPiece bp = (BasicPiece) Decorator.getInnermost(ratings);
-      final BufferedImage bi = new BufferedImage(75, 75, BufferedImage.TYPE_3BYTE_BGR);
+      final BufferedImage bi = new BufferedImage(unitWidth, unitWidth, BufferedImage.TYPE_3BYTE_BGR);
       Graphics g = bi.getGraphics();
-      bp.draw(g, 37, 37, null, 1.0);
+      bp.draw(g, halfWidth, halfWidth, null, 1.0);
       front = new JLabel(new ImageIcon(bi));
-      final Dimension d = new Dimension(75, 75);
+      final Dimension d = new Dimension(unitWidth, unitWidth);
       front.setMinimumSize(d);
       front.setMaximumSize(d);
       front.setPreferredSize(d);
@@ -836,23 +839,23 @@ public class TdcRatings extends Decorator implements EditablePiece {
         outer = ((Decorator) outer).getInner();
       }
 
-      final BufferedImage bi2 = new BufferedImage(75, 75, BufferedImage.TYPE_3BYTE_BGR);
+      final BufferedImage bi2 = new BufferedImage(unitWidth, unitWidth, BufferedImage.TYPE_3BYTE_BGR);
       g = bi2.getGraphics();
       if (trn != null) {
         final boolean isActive = trn.isActive();
         trn.setActive(true);
-        trn.draw(g, 37, 37, null, 1.0);
+        trn.draw(g, halfWidth, halfWidth, null, 1.0);
         trn.setActive(isActive);
       }
       else if (stepImage != null) {
         final boolean isActive = stepImage.isActive();
         stepImage.setActive(true);
-        stepImage.draw(g, 37, 37, null, 1.0);
+        stepImage.draw(g, halfWidth, halfWidth, null, 1.0);
         stepImage.setActive(isActive);
       }
       else {
         g.setColor(Color.white);
-        g.fillRect(0, 0, 75, 75);
+        g.fillRect(0, 0, unitWidth, unitWidth);
       }
 
       transport = new JLabel(new ImageIcon(bi2));

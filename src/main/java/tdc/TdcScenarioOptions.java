@@ -167,7 +167,7 @@ public class TdcScenarioOptions extends Widget {
         airPowerClear = new StringEnumOption(
           TdcProperties.TGD_DAILY_AIR_POWER_CLEAR,
           "Daily Air Power Allocation - Clear",
-          new String[] {"0", "1", "2", "3", "4", "5", "6", "8", "10", "12", "18"});
+          new String[] {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "18"});
         ddBox.add(airPowerClear);
 
         airPowerOvercast = new StringEnumOption(

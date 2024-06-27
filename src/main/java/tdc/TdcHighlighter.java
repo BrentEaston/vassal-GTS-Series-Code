@@ -55,6 +55,7 @@ public class TdcHighlighter extends ColoredBorder {
 
     final boolean isHidden = Boolean.TRUE.equals(p.getProperty(Properties.INVISIBLE_TO_ME));
     final boolean isObscured = Boolean.TRUE.equals(p.getProperty(Properties.OBSCURED_TO_ME));
+    final int unitWidth = UnitInfo.getStandardUnitSize();
 
     if (p.getMap() == null || isHidden || isObscured) {
       super.draw(p, g, x, y, obs, zoom);
@@ -78,17 +79,14 @@ public class TdcHighlighter extends ColoredBorder {
       int x1 = x + (int) (zoom  * r.x) - 1;
       int y2 = y + (int) (zoom  * (r.y + r.height));
       int x2 = x1 + (int) (zoom  * r.width);
-      int y1 = y2 - (int) (zoom  * 75);
+      int y1 = y2 - (int) (zoom  * unitWidth);
       g.setColor(Color.red);
       g.drawLine(x1, y2, x2, y1);
     }
     else if (info.isNonFormationCommand()) {
       setColor(Color.magenta);
       setThickness(3);
-      if (numberFont == null || lastZoom != zoom) {
-        numberFont = new Font(Font.DIALOG, Font.BOLD, (int) (16 * zoom));
-      }
-      LabelUtils.drawLabel(g, "+1CP", x + (int) (15 * zoom), y - (int) (50 * zoom), numberFont,
+      LabelUtils.drawLabel(g, "+1CP", x + (int) (15 * zoom), y - (int) (50 * zoom), getNumberFont(zoom),
           LabelUtils.CENTER, LabelUtils.CENTER, Color.RED, Color.WHITE, Color.BLACK);
     }
 
@@ -97,9 +95,6 @@ public class TdcHighlighter extends ColoredBorder {
     setThickness(oldThickness);
 
     if (info.isTqrAdjusted()) {
-      if (numberFont == null || lastZoom != zoom) {
-        numberFont = new Font(Font.DIALOG, Font.BOLD, (int) (16 * zoom));
-      }
       Color color;
       final int tqAdjustment = info.getTqrAdjustment() ;
       if (tqAdjustment < 0) {
@@ -111,42 +106,37 @@ public class TdcHighlighter extends ColoredBorder {
       else {
         color = Color.blue;
       }
-      LabelUtils.drawLabel(g, info.getTqrAdjustmentString(), x + (int) (52 * zoom), y - (int) (28 * zoom), numberFont,
+      LabelUtils.drawLabel(g, info.getTqrAdjustmentString(), x + (int) (52 * zoom), y - (int) (28 * zoom), getNumberFont(zoom),
           LabelUtils.CENTER, LabelUtils.CENTER, color, Color.WHITE, Color.BLACK);
     }
 
     if (info.isMoveAdjusted()) {
-      if (numberFont == null || lastZoom != zoom) {
-        numberFont = new Font(Font.DIALOG, Font.BOLD, (int) (16 * zoom));
-      }
-      LabelUtils.drawLabel(g, info.getAdjustedMove(), x + (int) (71 * zoom), y - (int) (6 * zoom), numberFont,
+      LabelUtils.drawLabel(g, info.getAdjustedMove(), x + (int) (71 * zoom), y - (int) (6 * zoom), getNumberFont(zoom),
           LabelUtils.LEFT, LabelUtils.CENTER, Color.BLACK, Color.WHITE, Color.BLACK);
     }
     
     if (info.isFireAdjusted()) {
-      if (numberFont == null || lastZoom != zoom) {
-        numberFont = new Font(Font.DIALOG, Font.BOLD, (int) (14 * zoom));
-      }
-      LabelUtils.drawLabel(g, info.getFireAdjustmentString(), x - (int) (51 * zoom), y - (int) (30 * zoom), numberFont,
+      LabelUtils.drawLabel(g, info.getFireAdjustmentString(), x - (int) (51 * zoom), y - (int) (30 * zoom), getNumberFont(zoom),
           LabelUtils.CENTER, LabelUtils.CENTER, Color.BLACK, Color.WHITE, Color.BLACK);
     }
 
     if (info.isAssaultAdjusted()) {
-      if (numberFont == null || lastZoom != zoom) {
-        numberFont = new Font(Font.DIALOG, Font.BOLD, (int) (14 * zoom));
-      }
-      LabelUtils.drawLabel(g, info.getAssaultAdjustmentString(), x - (int) (51 * zoom), y - (int) (10 * zoom), numberFont,
+      LabelUtils.drawLabel(g, info.getAssaultAdjustmentString(), x - (int) (51 * zoom), y - (int) (10 * zoom), getNumberFont(zoom),
           LabelUtils.CENTER, LabelUtils.CENTER, Color.BLACK, Color.WHITE, Color.BLACK);
     }
 
     if (info.isDefenceAdjusted()) {
-      if (numberFont == null || lastZoom != zoom) {
-        numberFont = new Font(Font.DIALOG, Font.BOLD, (int) (14 * zoom));
-      }
       LabelUtils.drawLabel(g, info.getDefenceAdjustmentString(), x - (int) (51 * zoom), y
-          + (int) (15 * zoom), numberFont, LabelUtils.CENTER, LabelUtils.CENTER, Color.BLACK,
+          + (int) (15 * zoom), getNumberFont(zoom), LabelUtils.CENTER, LabelUtils.CENTER, Color.BLACK,
           Color.WHITE, Color.BLACK);
     }
+  }
+
+  private Font getNumberFont(double zoom) {
+    if (numberFont == null || lastZoom != zoom) {
+      numberFont = new Font(Font.DIALOG, Font.BOLD, (int) (UnitInfo.getStandardUnitSize() * 0.21 * zoom));
+    }
+    return numberFont;
   }
 
 }

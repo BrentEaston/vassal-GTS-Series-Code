@@ -99,6 +99,7 @@ public class UnitInfo {
   protected ArrayList<String> rangeDetails = new ArrayList<>();
   protected ArrayList<String> tqrDetails = new ArrayList<>();
   protected ArrayList<String> moveDetails = new ArrayList<>();
+  protected ArrayList<String> details = new ArrayList<>();
 
   // Adjustments due to Special Rules for TdcHighligher
   protected boolean tqrAdjusted;
@@ -163,6 +164,18 @@ public class UnitInfo {
 
   public static boolean isCreteRules() {
     return TdcProperties.RULES_CRETE.equals(getRuleSet());
+  }
+
+  public static boolean isSaarRules() {
+    return TdcProperties.RULES_SAAR.equals(getRuleSet());
+  }
+
+  public static boolean isBastogneRules() {
+    return TdcProperties.RULES_BASTOGNE.equals(getRuleSet());
+  }
+
+  public static int getStandardUnitSize() {
+    return (isSaarRules() || isBastogneRules()) ? 112 : 75;
   }
 
   public static boolean isAmdRules() {
@@ -786,21 +799,39 @@ public class UnitInfo {
   protected void adjustFireRating(String reason, int value) {
     adjustRating(TdcRatings.FIRE_RATING, value);
     fireDetails.add(displayInt(value) + " " + reason);
+    addDetail(reason);
   }
 
   protected void adjustAssaultRating(String reason, int value) {
     adjustRating(TdcRatings.ASSAULT_RATING, value);
     assaultDetails.add(displayInt(value) + " " + reason);
+    addDetail(reason);
   }
 
   protected void adjustDefenceRating(String reason, int value) {
     adjustRating(TdcRatings.DEF_RATING, value);
     defenceDetails.add(displayInt(value) + " " + reason);
+    addDetail(reason);
   }
 
   protected void adjustTqrRating(String reason, int value) {
     adjustRating(TdcRatings.TQR_RATING, value);
     tqrDetails.add(displayInt(value) + " " + reason);
+    addDetail(reason);
+  }
+
+  protected void addDetail(String reason) {
+    if (!details.contains(reason)) {
+      details.add(reason);
+    }
+  }
+
+  public String getDetailSummary() {
+    String d = "";
+    for (final String detail : details) {
+      d = d + (d.isEmpty() ? "" : ", ") + detail;
+    }
+    return d;
   }
 
   protected void setRating(String key, String value) {
@@ -2044,6 +2075,10 @@ public class UnitInfo {
       label = new JLabel("Notes");
       label.setFont(headFont);
       panel.add(label, "wrap");
+
+      if (baseRatings == null) {
+        return;
+      }
 
       panel.add(new Label("Movement"));
       panel.add(new Label(baseRatings.get(TdcRatings.MOVE_RATING)));

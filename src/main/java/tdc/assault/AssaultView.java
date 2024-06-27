@@ -64,6 +64,8 @@ public class AssaultView {
     stepNumber.setText("Step "+myModel.getStep());
     stepDescription.setText(myModel.getStepDescription());
     stepDetails.setText(myModel.getStepDetails());
+    detailPanel.removeAll();
+    detailPanel.add(getDetailPanelForStep(myModel.getStep()));
   }
   
   protected void buildContent() {
@@ -92,94 +94,12 @@ public class AssaultView {
     stepDetails.setWrapStyleWord(true);
     stepDetails.setFont(MEDIUM_FONT);    
     descPanel.add(stepDetails);
-    
-    stepChanged();  
-    
-    detailPanel =  new JPanel(new MigLayout("gap 0,insets 5,fill", "[center,fill,grow 20][center,fill,grow 5][center,fill,grow 5][fill,grow 5][fill,grow 20][fill,grow 20]","[fill,grow]"));
-    detailPanel.setBorder(BorderFactory.createEtchedBorder());
-    
-    JLabelPanel l = new JLabelPanel("Unit", SwingConstants.CENTER);
-    l.setFont(LARGE_BOLD_FONT);
-    l.setBorder(TOP_LEFT_BORDER);
-    detailPanel.add(l, "span 1 2");
-    
-    JLabelPanel name = new JLabelPanel("Effective", SwingConstants.CENTER);
-    name.setFont(LARGE_BOLD_FONT);
-    name.setBorder(TOP_LEFT_BORDER);
-    detailPanel.add (name, "span 3");
-    
-    JLabelPanel assault = new JLabelPanel("May Assault?", SwingConstants.CENTER);
-    assault.setFont(LARGE_BOLD_FONT);
-    assault.setBorder(TOP_LEFT_BORDER);
-    detailPanel.add (assault, "span 1 2");
-    
-    JLabelPanel cont = new JLabelPanel("Continue?", SwingConstants.CENTER);
-    cont.setFont(LARGE_BOLD_FONT);
-    cont.setBorder(TOP_RIGHT_BORDER);
-    detailPanel.add (cont, "span 1 2,wrap");
-    
-    l = new JLabelPanel("Att", SwingConstants.CENTER);
-    l.setFont(LARGE_BOLD_FONT);
-    l.setBorder(TOP_LEFT_BORDER);
-    detailPanel.add(l);
-    
-    l = new JLabelPanel("Def", SwingConstants.CENTER);
-    l.setFont(LARGE_BOLD_FONT);
-    l.setBorder(TOP_LEFT_BORDER);
-    detailPanel.add(l);
-    
-    l = new JLabelPanel("Tqr", SwingConstants.CENTER);
-    l.setFont(LARGE_BOLD_FONT);
-    l.setBorder(TOP_LEFT_BORDER);
-    detailPanel.add(l,"wrap");
-    
-    final int count = myModel.getSourceCount();
-    
-    for (int i = 0; i < count; i++) {      
-      l = new JLabelPanel("", SwingConstants.CENTER);
-      final ImageIcon ii = new ImageIcon();
-      ii.setImage(myModel.getSourceImage(i));
-      l.setIcon(ii);
-      l.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
-      detailPanel.add(l);   
-      
-      name = new JLabelPanel(myModel.getPrimaryAssaultRating(i)+"/"+myModel.getSecondaryAssaultRating(i), SwingConstants.CENTER);
-      name.setFont(MEDIUM_FONT);
-      name.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
-      detailPanel.add (name);
 
-      name = new JLabelPanel(myModel.getSourceDef(i), SwingConstants.CENTER);
-      name.setFont(MEDIUM_FONT);
-      name.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
-      detailPanel.add (name);
-      
-      name = new JLabelPanel(String.valueOf(myModel.getSourceTqr(i)), SwingConstants.CENTER);
-      name.setFont(MEDIUM_FONT);
-      name.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
-      detailPanel.add (name);
-      
-      assault = new JLabelPanel(myModel.getSourceAssaultReason(i), SwingConstants.CENTER);
-      assault.setFont(MEDIUM_FONT);
-      assault.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
-      detailPanel.add (assault);
-      
-      JPanel selectPanel = new JPanel(new MigLayout("insets 4,fillx,filly","push[]push","push[]push"));
-      JCheckBox check = new JCheckBox();
-      check.setEnabled(myModel.canAssault(i));
-      check.setName(String.valueOf(i));
-      check.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {          
-          checkChanged((JCheckBox) e.getSource());
-        }});
-          
-      selectPanel.add(check);
-      selectPanel.setBorder(i < (count-1) ? TOP_RIGHT_BORDER : BOT_RIGHT_BORDER);
-      detailPanel.add(selectPanel, "wrap");
-      
-    }
+    detailPanel = new JPanel();
+
+    stepChanged();
     
 
-    
     stepPanel.add(stepNoPanel, "growx 10");
     stepPanel.add(stepDescPanel, "growx 90,growy,wrap");
     
@@ -196,9 +116,117 @@ public class AssaultView {
     continuePanel.add(continueButton);
     mainPanel.add(continuePanel, "span 2,growx");
   }
-  
+
+  protected JPanel getDetailPanelForStep(int step) {
+    JPanel detailPanel = new JPanel();
+
+    if (step == AssaultModel.STEP_SELECT) {
+      detailPanel =  new JPanel(new MigLayout("gap 0,insets 5,fill", "[center,fill,grow 20][center,fill,grow 5][center,fill,grow 5][center,fill,grow 5][fill,grow 5][fill,grow 20][fill,grow 20]","[fill,grow]"));
+      detailPanel.setBorder(BorderFactory.createEtchedBorder());
+
+      JLabelPanel l = new JLabelPanel("Unit", SwingConstants.CENTER);
+      l.setFont(LARGE_BOLD_FONT);
+      l.setBorder(TOP_LEFT_BORDER);
+      detailPanel.add(l, "span 1 2");
+
+      JLabelPanel name = new JLabelPanel("Effective", SwingConstants.CENTER);
+      name.setFont(LARGE_BOLD_FONT);
+      name.setBorder(TOP_LEFT_BORDER);
+      detailPanel.add (name, "span 3");
+
+      JLabelPanel details = new JLabelPanel("Details", SwingConstants.CENTER);
+      details.setFont(LARGE_BOLD_FONT);
+      details.setBorder(TOP_LEFT_BORDER);
+      detailPanel.add (details, "span 1 2");
+
+      JLabelPanel assault = new JLabelPanel("<html><center>May<br>Assault?", SwingConstants.CENTER);
+      assault.setFont(LARGE_BOLD_FONT);
+      assault.setBorder(TOP_LEFT_BORDER);
+      detailPanel.add (assault, "span 1 2");
+
+      JLabelPanel cont = new JLabelPanel("Continue?", SwingConstants.CENTER);
+      cont.setFont(LARGE_BOLD_FONT);
+      cont.setBorder(TOP_RIGHT_BORDER);
+      detailPanel.add (cont, "span 1 2,wrap");
+
+      l = new JLabelPanel("Attack", SwingConstants.CENTER);
+      l.setFont(LARGE_BOLD_FONT);
+      l.setBorder(TOP_LEFT_BORDER);
+      detailPanel.add(l);
+
+      l = new JLabelPanel("Def", SwingConstants.CENTER);
+      l.setFont(LARGE_BOLD_FONT);
+      l.setBorder(TOP_LEFT_BORDER);
+      detailPanel.add(l);
+
+      l = new JLabelPanel("Tqr", SwingConstants.CENTER);
+      l.setFont(LARGE_BOLD_FONT);
+      l.setBorder(TOP_LEFT_BORDER);
+      detailPanel.add(l,"wrap");
+
+      final int count = myModel.getSourceCount();
+
+      for (int i = 0; i < count; i++) {
+        l = new JLabelPanel("", SwingConstants.CENTER);
+        final ImageIcon ii = new ImageIcon();
+        ii.setImage(myModel.getSourceImage(i));
+        l.setIcon(ii);
+        l.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
+        detailPanel.add(l);
+
+        name = new JLabelPanel(
+          "<html>" +
+            myModel.getPrimaryAssaultRating(i) +
+            "/" +
+            myModel.getPrimaryAssaultColour(i) +
+            "<br>" +
+            myModel.getSecondaryAssaultRating(i) +
+            "/" +
+            myModel.getSecondaryAssaultColour(i)
+          ,
+          SwingConstants.CENTER);
+        name.setFont(MEDIUM_FONT);
+        name.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
+        detailPanel.add (name);
+
+        name = new JLabelPanel(myModel.getSourceDef(i), SwingConstants.CENTER);
+        name.setFont(MEDIUM_FONT);
+        name.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
+        detailPanel.add (name);
+
+        name = new JLabelPanel(String.valueOf(myModel.getSourceTqr(i)), SwingConstants.CENTER);
+        name.setFont(MEDIUM_FONT);
+        name.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
+        detailPanel.add (name);
+
+        name = new JLabelPanel(myModel.getSourceDetails(i), SwingConstants.CENTER);
+        name.setFont(MEDIUM_FONT);
+        name.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
+        detailPanel.add (name);
+
+        assault = new JLabelPanel(myModel.getSourceAssaultReason(i), SwingConstants.CENTER);
+        assault.setFont(MEDIUM_FONT);
+        assault.setBorder(i < (count-1) ? TOP_LEFT_BORDER : BOT_LEFT_BORDER);
+        detailPanel.add (assault);
+
+        JPanel selectPanel = new JPanel(new MigLayout("insets 4,fillx,filly","push[]push","push[]push"));
+        JCheckBox check = new JCheckBox();
+        check.setEnabled(myModel.canAssault(i));
+        check.setName(String.valueOf(i));
+        check.addActionListener(e -> checkChanged((JCheckBox) e.getSource()));
+
+        selectPanel.add(check);
+        selectPanel.setBorder(i < (count-1) ? TOP_RIGHT_BORDER : BOT_RIGHT_BORDER);
+        detailPanel.add(selectPanel, "wrap");
+
+      }
+    }
+    return detailPanel;
+  }
+
   protected void doContinue() {
-    
+    myModel.nextStep();
+    stepChanged();
   }
   
   public void checkChanged(JCheckBox check) {

@@ -40,7 +40,6 @@ import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
-import VASSAL.build.Buildable;
 import VASSAL.build.GameModule;
 import VASSAL.build.module.map.boardPicker.Board;
 import VASSAL.build.module.map.boardPicker.board.HexGrid;
@@ -574,10 +573,10 @@ public class TerrainHexGrid extends HexGrid {
   public void highlightTerrain(Graphics g, Rectangle visibleRect, double zoom) {
     final Prefs prefs = GameModule.getGameModule().getPrefs();
 
-    final boolean streamHighlight = (Boolean) prefs.getValue(TdcProperties.TERRAIN_STREAM + TerrainHighlightMenu.HIGHLIGHT);
-    final boolean riverHighlight = (Boolean) prefs.getValue(TdcProperties.TERRAIN_RIVER + TerrainHighlightMenu.HIGHLIGHT);
-    final boolean crestHighlight = (Boolean) prefs.getValue(TdcProperties.TERRAIN_CREST + TerrainHighlightMenu.HIGHLIGHT);
-    final boolean ridgeHighlight = (Boolean) prefs.getValue(TdcProperties.TERRAIN_RIDGE + TerrainHighlightMenu.HIGHLIGHT);
+    final boolean streamHighlight = Boolean.TRUE.equals(prefs.getValue(TdcProperties.TERRAIN_STREAM + TerrainHighlightMenu.HIGHLIGHT_GP_SUFFIX));
+    final boolean riverHighlight = Boolean.TRUE.equals(prefs.getValue(TdcProperties.TERRAIN_RIVER + TerrainHighlightMenu.HIGHLIGHT_GP_SUFFIX));
+    final boolean crestHighlight = Boolean.TRUE.equals(prefs.getValue(TdcProperties.TERRAIN_CREST + TerrainHighlightMenu.HIGHLIGHT_GP_SUFFIX));
+    final boolean ridgeHighlight = Boolean.TRUE.equals(prefs.getValue(TdcProperties.TERRAIN_RIDGE + TerrainHighlightMenu.HIGHLIGHT_GP_SUFFIX));
 
     final Color streamColor = (Color) prefs.getValue(TdcProperties.TERRAIN_STREAM + "Color");
     final Color riverColor = (Color) prefs.getValue(TdcProperties.TERRAIN_RIVER + "Color");
