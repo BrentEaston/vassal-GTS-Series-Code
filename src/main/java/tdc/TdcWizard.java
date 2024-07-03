@@ -98,6 +98,7 @@ public class TdcWizard extends Decorator implements EditablePiece {
   protected boolean isNavalUnit = false;
   protected GamePiece assaultForceMarker;
   protected KeyCommand airDefenceCommand;
+  protected GamePiece outer;
 
   public TdcWizard() {
     this(ID + "65,520;73,520", null);
@@ -129,22 +130,23 @@ public class TdcWizard extends Decorator implements EditablePiece {
     units.clear();
     targets.clear();
     info = new UnitInfo(Decorator.getOutermost(this), true);
+    outer = Decorator.getOutermost(this);
 
     // System.out.println(piece.getProperty(BasicPiece.BASIC_NAME)+" - "+piece.getProperty(TdcProperties.TYPE));
     
     // Air and Partisan attacks are special attacks on the same stack as the source, not LOS thread.
-    if (TdcProperties.CLASS_AIRPOWER.equals(piece.getProperty(TdcProperties.CLASS)) || TdcProperties.CLASS_PARTISAN.equals(piece.getProperty(TdcProperties.CLASS)) ) {
+    if (TdcProperties.CLASS_AIRPOWER.equals(outer.getProperty(TdcProperties.CLASS)) || TdcProperties.CLASS_PARTISAN.equals(outer.getProperty(TdcProperties.CLASS)) ) {
      isAirPower = true;
      attackCommand = new KeyCommand(ATTACK_COMMAND, attackKey, Decorator.getOutermost(this));
      attackCommand.setEnabled(getMap() != null && getMap() instanceof TdcMap);
      keyCommands.add(attackCommand);
     }
     // Attacks using an Artillery Park, Artillery Force or Naval Target marker must build a list of units in their matching Artillery Park/Naval Box
-    else if (TdcProperties.TYPE_ARTILLERY_PARK.equals(piece.getProperty(TdcProperties.TYPE))) {
-      if (TdcProperties.DIVISION_NAVAL.equals(piece.getProperty(TdcProperties.DIVISION))) {
+    else if (TdcProperties.TYPE_ARTILLERY_PARK.equals(outer.getProperty(TdcProperties.TYPE))) {
+      if (TdcProperties.DIVISION_NAVAL.equals(outer.getProperty(TdcProperties.DIVISION))) {
         buildAssaultForceCommands();
       }
-      else if (TdcProperties.NAVAL_PERNELLE_RANGE.equals(piece.getProperty(TdcProperties.ARTILLERY_PARK_ID))) {
+      else if (TdcProperties.NAVAL_PERNELLE_RANGE.equals(outer.getProperty(TdcProperties.ARTILLERY_PARK_ID))) {
         buildArtilleryForceCommands();  
       }
       else {
@@ -155,7 +157,7 @@ public class TdcWizard extends Decorator implements EditablePiece {
     // Attacking with an Artillery Contact marker, attack with the Matching unit located in  the Artillery Park marker
     // Attacking with an Emplaced Artillery Contact marker, attack with the Matching unit assumed to be on the map
     // Exceptions are Utah:Maisy and Utah:La Pernelle
-    else if (TdcProperties.TYPE_ARTILLERY_MARKER.equals(piece.getProperty(TdcProperties.TYPE))) {
+    else if (TdcProperties.TYPE_ARTILLERY_MARKER.equals(outer.getProperty(TdcProperties.TYPE))) {
 
       findArtilleryPark();
 
@@ -174,7 +176,7 @@ public class TdcWizard extends Decorator implements EditablePiece {
         }
       }
       if (myWizard != null) {
-        assaultForceMarker = myWizard.findAssaultForceMarker((String) piece.getProperty(TdcProperties.NAVAL_PARK));
+        assaultForceMarker = myWizard.findAssaultForceMarker((String) outer.getProperty(TdcProperties.NAVAL_PARK));
         if (assaultForceMarker != null) {
           attackCommand = new KeyCommand(ATTACK_COMMAND, attackKey, Decorator.getOutermost(assaultForceMarker));
           attackCommand.setEnabled((getMap() != null) && (getMap() instanceof TdcMap) && (assaultForceMarker != null));
@@ -205,9 +207,9 @@ public class TdcWizard extends Decorator implements EditablePiece {
     if (TdcProperties.TERRAIN_BEACH.equals(terrain) || info.isLCS()) {
       final KeyCommandSubMenu sub = new KeyCommandSubMenu("Beach", this, null);
 
-      final String dd = (String) getProperty(TdcProperties.DD);
+      final String dd = (String) outer.getProperty(TdcProperties.DD);
 
-      String overlay = (String) getProperty(TdcProperties.OVERLAY);
+      String overlay = (String) outer.getProperty(TdcProperties.OVERLAY);
       if (overlay != null && overlay.startsWith("Utah-")) overlay = "Utah";
       final GameModule gm = GameModule.getGameModule();
       final boolean nestsRemaining = !"0".equals(gm.getProperty(overlay + "-Nests"));
@@ -251,7 +253,7 @@ public class TdcWizard extends Decorator implements EditablePiece {
     }
 
     // Air Defence Attack
-    if ("true".equals(Decorator.getOutermost(this).getProperty(TdcProperties.IS_AIR_DEFENCE))) {
+    if ("true".equals(outer.getProperty(TdcProperties.IS_AIR_DEFENCE))) {
       airDefenceCommand = new KeyCommand(AttackWizard.AIR_DEFENCE_ATTACK, new NamedKeyStroke(AttackWizard.AIR_DEFENCE_ATTACK),
           this);
       keyCommands.add(airDefenceCommand);
@@ -269,7 +271,7 @@ public class TdcWizard extends Decorator implements EditablePiece {
     String artilleryParkDivision = null;
     
     // 1. Find the name of the matching Artillery Unit
-    final String artilleryUnitName = (String) piece.getProperty(ArtilleryMarker.MARKER_NAME);
+    final String artilleryUnitName = (String) outer.getProperty(ArtilleryMarker.MARKER_NAME);
     if (artilleryUnitName == null || artilleryUnitName.length() == 0) return;
     
     // 2. Find the Artillery unit
@@ -329,7 +331,7 @@ public class TdcWizard extends Decorator implements EditablePiece {
     final KeyCommandSubMenu sub = new KeyCommandSubMenu(ATTACK_WITH_COMMAND, this, null);
     sub.setEnabled(getMap() != null && getMap() instanceof TdcMap);
     
-    final String parkId = (String) piece.getProperty(TdcProperties.ARTILLERY_PARK_ID);
+    final String parkId = (String) outer.getProperty(TdcProperties.ARTILLERY_PARK_ID);
     final Map map = piece.getMap();
     if (map == null) {
       return;
@@ -388,8 +390,8 @@ public class TdcWizard extends Decorator implements EditablePiece {
     final KeyCommandSubMenu sub = new KeyCommandSubMenu(ATTACK_WITH_COMMAND, this, null);
     sub.setEnabled(getMap() != null && getMap() instanceof TdcMap);
 
-    final String aparkMap = (String) piece.getProperty(TdcProperties.ARTILLERY_PARK_MAP);
-    final String parkId = (String) piece.getProperty(TdcProperties.ARTILLERY_PARK_ID);
+    final String aparkMap = (String) outer.getProperty(TdcProperties.ARTILLERY_PARK_MAP);
+    final String parkId = (String) outer.getProperty(TdcProperties.ARTILLERY_PARK_ID);
     final Map map = Map.getMapById(aparkMap);
     if (map == null) {
       return;

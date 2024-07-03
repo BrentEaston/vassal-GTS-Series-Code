@@ -48,6 +48,7 @@ public class UnitInfo {
   protected static HashMap<String, TerrainInfo> terrainInfo, terrainInfoArmoured;
   protected static HashMap<String, TerrainInfo> terrainInfoRubble; // Use TerrainInfo to mark as -1 hexs subject to Rubble
   protected static String ruleset;
+  protected static String subruleset;
 
   protected GamePiece unit;
   protected HashMap<String, String> ratings;
@@ -142,6 +143,14 @@ public class UnitInfo {
     return ruleset;
   }
 
+  public static String getRuleSubSet() {
+    subruleset = (String) GameModule.getGameModule().getProperty(TdcProperties.SUB_RULESET);
+    if (subruleset == null)
+      subruleset = TdcProperties.RULES_GJS;
+    return subruleset;
+  }
+
+
   public static boolean isNqosRules() {
     return TdcProperties.RULES_NQOS.equals(getRuleSet());
   }
@@ -152,6 +161,14 @@ public class UnitInfo {
 
   public static boolean isTgdRules() {
     return TdcProperties.RULES_TGD.equals(getRuleSet()) || TdcProperties.RULES_DDAY.equals(getRuleSet());
+  }
+
+  public static boolean isSjgRules() {
+    return isTgdRules() && TdcProperties.RULES_GJS.equals(getRuleSubSet());
+  }
+
+  public static boolean isUtahRules() {
+    return isTgdRules() && TdcProperties.RULES_UTAH.equals(getRuleSubSet());
   }
 
   public static boolean isTdcRules() {
@@ -176,6 +193,10 @@ public class UnitInfo {
 
   public static int getStandardUnitSize() {
     return (isSaarRules() || isBastogneRules()) ? 112 : 75;
+  }
+
+  public static boolean hasLargeUnits() {
+    return isSaarRules() || isBastogneRules();
   }
 
   public static boolean isAmdRules() {
@@ -423,6 +444,10 @@ public class UnitInfo {
 
   public int getMass() {
     return mass;
+  }
+
+  public int getBarrageLevel() {
+    return barrage;
   }
 
   public int getCoHits() {

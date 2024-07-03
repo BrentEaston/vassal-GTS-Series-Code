@@ -32,23 +32,37 @@ import VASSAL.command.ChangeTracker;
 import VASSAL.command.Command;
 import VASSAL.command.CommandEncoder;
 import VASSAL.configure.BooleanConfigurer;
-import VASSAL.configure.Configurer;
-import VASSAL.configure.ConfigurerPanel;
 import VASSAL.configure.StringEnumConfigurer;
-import VASSAL.configure.TranslatingStringEnumConfigurer;
-import VASSAL.counters.*;
+import VASSAL.counters.BasicPiece;
+import VASSAL.counters.Decorator;
+import VASSAL.counters.Embellishment;
+import VASSAL.counters.GamePiece;
+import VASSAL.counters.PieceFinder;
+import VASSAL.counters.Stack;
 import VASSAL.tools.SequenceEncoder;
 import VASSAL.tools.UniqueIdManager;
-import VASSAL.tools.imageop.Op;
-import VASSAL.tools.imageop.OpIcon;
+
 import tdc.attack.AttackModel;
 import tdc.attack.AttackView;
 import tdc.attack.FireModifier;
 import tdc.attack.FireResolver;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,12 +125,6 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
   protected int specialAttackType = NO_SPECIAL_ATTACK;
   protected int addRange;
   protected boolean isAirDefence;
-
-  protected static ColumnConfigurer columnConfig;
-  protected static boolean standardColumnType = true;
-  public static final String COLUMN_TYPE = "ColumnType";
-  public static final String COLUMN_LONG = "Long, Centered";
-  public static final String COLUMN_SHORT = "Short, Offset";
 
   public AttackWizard() {
 
@@ -765,9 +773,6 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
     autoCloseConfig = new BooleanConfigurer(AUTO_CLOSE, "Auto-close Attack Wizard?", true);
     GameModule.getGameModule().getPrefs().addOption(TdcProperties.PREF_TAB, autoCloseConfig);
 
-    columnConfig = new ColumnConfigurer(COLUMN_TYPE, "On-counter Column Marker Type");
-    GameModule.getGameModule().getPrefs().addOption(TdcProperties.PREF_TAB, columnConfig);
-    columnConfig.addPropertyChangeListener(e -> GameModule.getGameModule().getPlayerWindow().repaint());
   }
 
   private void updateColumnType(String colType) {
@@ -1068,10 +1073,15 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
             }
           }
         }
-        if (myModel.isObstaclesAttack() && roll == 0) {
+        if (myModel.isObstaclesAttack() && roll == 0 && UnitInfo.isSjgRules()) {
+          // SJG Only
           text.add("*** 0 rolled on Beach Obstacle attack, Drift marker applied ***");
           extras = myModel.getTarget().keyEvent(KeyStroke.getKeyStroke('D', InputEvent.ALT_DOWN_MASK));
         }
+        if (myModel.isObstaclesAttack() && roll == 9 && UnitInfo.isUtahRules()) {
+          text.add("*** 9 rolled on Beach Obstacle attack, Apply Drift adjustment ***");
+        }
+
         if (myModel.isRubblePossible() && roll == 0) {
           text.add("*** 0 rolled. Add rubble marker. OP or Strongpoint destroyed. ***");
           // something similar could place a Rubble marker? extras = myModel.getTarget().keyEvent(KeyStroke.getKeyStroke('D', InputEvent.ALT_DOWN_MASK));
@@ -1484,126 +1494,4 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
       super(BasicPiece.ID + ";;" + SPECIAL_ATTACK_ICONS[specialAttackType] + ";" + SPECIAL_ATTACK_ICONS[specialAttackType] + ";");
     }
   }
-
-  class ColumnConfigurer extends Configurer {
-    private String[] validValues;
-    private JComboBox<String> box;
-    private ConfigurerPanel panel;
-
-    public ColumnConfigurer(String key, String name) {
-      super(key, name);
-      this.validValues = new String[] { COLUMN_LONG, COLUMN_SHORT };
-    }
-    public JComboBox<String> getBox() {
-      return box;
-    }
-
-    public void setBox(JComboBox<String> box) {
-      this.box = box;
-    }
-
-    @Override
-    public Component getControls() {
-      if (panel == null) {
-        panel = new ConfigurerPanel(getName(), "[]", "[]rel[]"); // NON-NLS
-
-        box = new JComboBox<>(validValues);
-        box.setRenderer(new IconListRenderer());
-        box.setMaximumSize(new Dimension(box.getMaximumSize().width, box.getPreferredSize().height));
-        if (isValidValue(getValue())) {
-          box.setSelectedItem(getValue());
-        }
-        else if (validValues.length > 0) {
-          box.setSelectedIndex(0);
-        }
-        box.addActionListener(e -> {
-          noUpdate = true;
-          setValue(box.getSelectedItem());
-          noUpdate = false;
-        });
-        panel.add(box);
-      }
-      return panel;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-      box.setEnabled(enabled);
-    }
-
-    public void setEditable(boolean enabled) {
-      box.setEditable(enabled);
-    }
-
-    public boolean isValidValue(Object o) {
-      for (final String validValue : validValues) {
-        if (validValue.equals(o)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    public String[] getValidValues() {
-      return validValues;
-    }
-
-    public void setValidValues(String[] s) {
-      validValues = s;
-      if (box == null) {
-        getControls();
-      }
-      box.setModel(new DefaultComboBoxModel<>(validValues));
-    }
-
-    @Override
-    public void setValue(Object o) {
-      if (validValues == null
-        || isValidValue(o)) {
-        super.setValue(o);
-        if (!noUpdate && box != null) {
-          box.setSelectedItem(o);
-        }
-      }
-    }
-
-    @Override
-    public String getValueString() {
-      return value == null ? "" : (String) value;
-    }
-
-    @Override
-    public void setValue(String s) {
-      setValue((Object) s);
-    }
-
-    @Override
-    public void setLabelVisible(boolean visible) {
-      panel.setLabelVisibility(visible);
-    }
-
-    class IconListRenderer extends DefaultListCellRenderer {
-      private static final long serialVersionUID = 1L;
-
-      private Icon longIcon;
-      private Icon shortIcon;
-
-      public IconListRenderer(){
-        super();
-        longIcon = new ImageIcon(Op.load("marker-column-lge-display.png").getImage());
-        shortIcon = new ImageIcon(Op.load("marker-column-sml-display.png").getImage());
-      }
-
-      @Override
-      public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-      {
-        JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-        // Set icon to display for value
-        label.setIcon(COLUMN_LONG.equals(value) ? longIcon : shortIcon);
-        return label;
-      }
-    }
-  }
-
 }

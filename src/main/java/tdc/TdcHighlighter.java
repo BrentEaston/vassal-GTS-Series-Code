@@ -56,6 +56,8 @@ public class TdcHighlighter extends ColoredBorder {
     final boolean isHidden = Boolean.TRUE.equals(p.getProperty(Properties.INVISIBLE_TO_ME));
     final boolean isObscured = Boolean.TRUE.equals(p.getProperty(Properties.OBSCURED_TO_ME));
     final int unitWidth = UnitInfo.getStandardUnitSize();
+    int xx = 0;
+    int yy = 0;
 
     if (p.getMap() == null || isHidden || isObscured) {
       super.draw(p, g, x, y, obs, zoom);
@@ -86,7 +88,9 @@ public class TdcHighlighter extends ColoredBorder {
     else if (info.isNonFormationCommand()) {
       setColor(Color.magenta);
       setThickness(3);
-      LabelUtils.drawLabel(g, "+1CP", x + (int) (15 * zoom), y - (int) (50 * zoom), getNumberFont(zoom),
+      xx = unitWidth == 75 ? 15 : 15;
+      yy = unitWidth == 75 ? 50 : 50;
+      LabelUtils.drawLabel(g, "+1CP", x + (int) (xx * zoom), y - (int) (yy * zoom), getNumberFont(zoom),
           LabelUtils.CENTER, LabelUtils.CENTER, Color.RED, Color.WHITE, Color.BLACK);
     }
 
@@ -106,35 +110,49 @@ public class TdcHighlighter extends ColoredBorder {
       else {
         color = Color.blue;
       }
-      LabelUtils.drawLabel(g, info.getTqrAdjustmentString(), x + (int) (52 * zoom), y - (int) (28 * zoom), getNumberFont(zoom),
+      xx = unitWidth == 75 ? 52 : 61;
+      yy = unitWidth == 75 ? 28 : 37;
+
+      LabelUtils.drawLabel(g, info.getTqrAdjustmentString(), x + (int) (xx * zoom), y - (int) (yy * zoom), getNumberFont(zoom),
           LabelUtils.CENTER, LabelUtils.CENTER, color, Color.WHITE, Color.BLACK);
     }
 
     if (info.isMoveAdjusted()) {
-      LabelUtils.drawLabel(g, info.getAdjustedMove(), x + (int) (71 * zoom), y - (int) (6 * zoom), getNumberFont(zoom),
+      xx = unitWidth == 75 ? 71 : 71;
+      yy = unitWidth == 75 ? 6 : 6;
+
+      LabelUtils.drawLabel(g, info.getAdjustedMove(), x + (int) (xx * zoom), y - (int) (yy * zoom), getNumberFont(zoom),
           LabelUtils.LEFT, LabelUtils.CENTER, Color.BLACK, Color.WHITE, Color.BLACK);
     }
     
     if (info.isFireAdjusted()) {
-      LabelUtils.drawLabel(g, info.getFireAdjustmentString(), x - (int) (51 * zoom), y - (int) (30 * zoom), getNumberFont(zoom),
+      xx = unitWidth == 75 ? 51 : 61;
+      yy = unitWidth == 75 ? 30 : 40;
+
+      LabelUtils.drawLabel(g, info.getFireAdjustmentString(), x - (int) (xx * zoom), y - (int) (yy * zoom), getNumberFont(zoom),
           LabelUtils.CENTER, LabelUtils.CENTER, Color.BLACK, Color.WHITE, Color.BLACK);
     }
 
     if (info.isAssaultAdjusted()) {
-      LabelUtils.drawLabel(g, info.getAssaultAdjustmentString(), x - (int) (51 * zoom), y - (int) (10 * zoom), getNumberFont(zoom),
+      xx = unitWidth == 75 ? 51 : 61;
+      yy = unitWidth == 75 ? 10 : 15;
+      LabelUtils.drawLabel(g, info.getAssaultAdjustmentString(), x - (int) (xx * zoom), y - (int) (yy * zoom), getNumberFont(zoom),
           LabelUtils.CENTER, LabelUtils.CENTER, Color.BLACK, Color.WHITE, Color.BLACK);
     }
 
     if (info.isDefenceAdjusted()) {
-      LabelUtils.drawLabel(g, info.getDefenceAdjustmentString(), x - (int) (51 * zoom), y
-          + (int) (15 * zoom), getNumberFont(zoom), LabelUtils.CENTER, LabelUtils.CENTER, Color.BLACK,
+      xx = unitWidth == 75 ? 51 : 65;
+      yy = unitWidth == 75 ? 15 : 18;
+      LabelUtils.drawLabel(g, info.getDefenceAdjustmentString(), x - (int) (xx * zoom), y
+          + (int) (yy * zoom), getNumberFont(zoom), LabelUtils.CENTER, LabelUtils.CENTER, Color.BLACK,
           Color.WHITE, Color.BLACK);
     }
   }
 
   private Font getNumberFont(double zoom) {
     if (numberFont == null || lastZoom != zoom) {
-      numberFont = new Font(Font.DIALOG, Font.BOLD, (int) (UnitInfo.getStandardUnitSize() * 0.21 * zoom));
+      final double scale = UnitInfo.getStandardUnitSize() == 75 ? 0.21 : 0.16;
+      numberFont = new Font(Font.DIALOG, Font.BOLD, (int) (UnitInfo.getStandardUnitSize() * scale * zoom));
     }
     return numberFont;
   }

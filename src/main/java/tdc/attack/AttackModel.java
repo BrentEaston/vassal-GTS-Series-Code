@@ -1027,11 +1027,11 @@ public class AttackModel {
       super(unit, true);
       terrain = TdcProperties.TERRAIN_BEACH;
       this.specialAttackType = specialAttackType;
-      this.overlay = overlay;
+      this.overlay = (overlay != null && overlay.startsWith("Utah")) ? "Utah" : overlay;
 
       fireColor = AttackWizard.SPECIAL_ATTACK_FIRE_COLORS[specialAttackType];
 
-      final String gpname = overlay + "-" + AttackWizard.SPECIAL_ATTACK_GP_NAMES[specialAttackType];
+      final String gpname = this.overlay + "-" + AttackWizard.SPECIAL_ATTACK_GP_NAMES[specialAttackType];
       final String f = (String) GameModule.getGameModule().getProperty(gpname);
 
       try {

@@ -34,6 +34,7 @@ import net.miginfocom.swing.MigLayout;
 import VASSAL.counters.GamePiece;
 import VASSAL.tools.imageop.Op;
 import VASSAL.tools.imageop.OpIcon;
+import tdc.UnitInfo;
 
 public abstract class AbstractUnitSelector {
     protected JPanel panel;
@@ -76,7 +77,7 @@ public abstract class AbstractUnitSelector {
 
       imagePanel = new JPanel(new MigLayout());
       imagePanel.setBorder(BorderFactory.createLineBorder(Color.black));
-      image = new BufferedImage(75, 75, BufferedImage.TYPE_INT_RGB);
+      image = new BufferedImage(UnitInfo.getStandardUnitSize(), UnitInfo.getStandardUnitSize(), BufferedImage.TYPE_INT_RGB);
       graphics = image.createGraphics();
       imageLabel = new JLabel();
       imagePanel.add(imageLabel);
@@ -106,7 +107,7 @@ public abstract class AbstractUnitSelector {
       selected = i;
       selectPiece(i);
 
-      getPiece().draw(graphics, 37, 37, null, 1.0f);
+      getPiece().draw(graphics, UnitInfo.getStandardUnitSize() / 2, UnitInfo.getStandardUnitSize() / 2, null, 1.0f);
       imageLabel.setIcon(new ImageIcon(image));
 
       leftButton.setEnabled(getSelectedIndex() > 0);

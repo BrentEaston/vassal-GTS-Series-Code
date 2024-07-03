@@ -320,6 +320,14 @@ public class TdcRatings extends Decorator implements EditablePiece {
       final UnitInfo info = new UnitInfo(Decorator.getOutermost(this), true);
       return String.valueOf(info.isArtillery());
     }
+    else if (TdcProperties.IS_COASTAL_ARTILLERY.equals(key)) {
+      final UnitInfo info = new UnitInfo(Decorator.getOutermost(this), true);
+      return String.valueOf(info.isCoastal());
+    }
+    else if (TdcProperties.IS_BARRAGED.equals(key)) {
+      final UnitInfo info = new UnitInfo(Decorator.getOutermost(this), true);
+      return String.valueOf(info.getBarrageLevel() == 1  || info.getBarrageLevel() == 2);
+    }
     else if (TdcProperties.IS_AIR_DEFENCE.equals(key)) {
       final String flakRating = ratings == null ? null : ratings.get(FLAK_RATING);
       return String.valueOf(flakRating != null && flakRating.length() > 0 && ! flakRating.equals("No"));

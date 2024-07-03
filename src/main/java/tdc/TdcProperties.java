@@ -291,6 +291,8 @@ public interface TdcProperties {
   String TDC_RANGE = "TdcRange";
   String IS_ARTILLERY = "isArtillery";
   String IS_AIR_DEFENCE = "isAirDefence";
+  String IS_BARRAGED = "isBarraged";
+  String IS_COASTAL_ARTILLERY = "isCoastalArtillery";
   String HOVER_TEXT = "hoverText";
   String ACTIVATION_COUNT = "activationCount";
   String ACTIVATION_LIMIT = "activationLimit";
