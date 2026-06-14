@@ -86,8 +86,8 @@ public class TdcLeader extends Decorator implements EditablePiece {
   protected Font displayFont2;
   protected String infoCommand = "Info";
   protected String flipCommand = "Flip";
-  protected KeyStroke infoKey = KeyStroke.getKeyStroke('I', java.awt.event.InputEvent.ALT_MASK);
-  protected KeyStroke flipKey = KeyStroke.getKeyStroke('F', java.awt.event.InputEvent.CTRL_MASK);
+  protected KeyStroke infoKey = KeyStroke.getKeyStroke('I', java.awt.event.InputEvent.ALT_DOWN_MASK);
+  protected KeyStroke flipKey = KeyStroke.getKeyStroke('F', java.awt.event.InputEvent.CTRL_DOWN_MASK);
   protected boolean isShowingInfo = false;
   protected BufferedImage infoImage;
 

@@ -503,10 +503,10 @@ public class TdcScenarioOptions extends Widget {
       }
       KeyStroke stroke;
       if (index == 0) {
-        stroke = KeyStroke.getKeyStroke('1', InputEvent.ALT_MASK);
+        stroke = KeyStroke.getKeyStroke('1', InputEvent.ALT_DOWN_MASK);
       }
       else {
-        stroke = KeyStroke.getKeyStroke('2', InputEvent.ALT_MASK);
+        stroke = KeyStroke.getKeyStroke('2', InputEvent.ALT_DOWN_MASK);
       }
 
       GlobalCommand gc = new GlobalCommand(new Loopable() {

@@ -51,6 +51,7 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
+import VASSAL.script.expression.AuditTrail;
 import terrain.TerrainHexGrid;
 import VASSAL.build.AbstractConfigurable;
 import VASSAL.build.AutoConfigurable;
@@ -141,7 +142,7 @@ public class TdcCounterDetailViewer extends AbstractConfigurable implements Draw
 
   public static final String SUM = "sum(propertyName)";
 
-  protected KeyStroke hotkey = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK);
+  protected KeyStroke hotkey = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
   protected Map map;
   protected int delay = 700;
   protected Timer delayTimer;
@@ -351,7 +352,7 @@ public class TdcCounterDetailViewer extends AbstractConfigurable implements Draw
         g.setClip(oldClip);
 
         if (isTextUnderCounters()) {
-          String text = counterReportFormat.getLocalizedText(piece);
+          String text = counterReportFormat.getLocalizedText(piece, null, (AuditTrail) null);
           if (text.length() > 0) {
             int x = dbounds.x - (int) (piecebounds.x * graphicsZoom * os_scale) + borderOffset;
             int y = dbounds.y + dbounds.height + 10;

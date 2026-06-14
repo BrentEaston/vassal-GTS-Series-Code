@@ -90,22 +90,22 @@ public class FireResolver {
     armoured.put(TdcRatings.PINK,   new String[] {RES_C, RES_P, RES_P, RES_S, RES_S, RES_C, RES_C, RES_1, RES_E});
     armoured.put(TdcRatings.PURPLE, new String[] {RES_C, RES_P, RES_P, RES_P, RES_P, RES_P, RES_P, RES_S, RES_S});
     armoured.put(TdcRatings.BROWN,  new String[] {RES_C, RES_P, RES_P, RES_P, RES_P, RES_C, RES_C, RES_1, RES_1});
-    if (UnitInfo.isCreteRules()) {
+    if (UnitInfo.isCreteRules() || UnitInfo.isSHRules()) {
       armoured.put(TdcRatings.BLUE,   new String[] {RES_C, RES_P, RES_P, RES_C, RES_1, RES_1, RES_E, RES_E, RES_E});
       armoured.put(TdcRatings.GREEN,  new String[] {RES_C, RES_P, RES_P, RES_P, RES_P, RES_S, RES_C, RES_1, RES_1});
     }
     else {
-      armoured.put(TdcRatings.BLUE,   new String[] {RES_C, RES_S, RES_S, RES_C, RES_1, RES_1, RES_E, RES_E, RES_E});
+      armoured.put(TdcRatings.BLUE, new String[]{RES_C, RES_S, RES_S, RES_C, RES_1, RES_1, RES_E, RES_E, RES_E});
       armoured.put(TdcRatings.GREEN,  new String[] {RES_C, RES_P, RES_P, RES_P, RES_P, RES_S, RES_C, RES_C, RES_1});
     }
     armoured.put(TdcRatings.BLACK,  new String[] {RES_C, RES_P, RES_P, RES_P, RES_P, RES_C, RES_C, RES_1, RES_1});
     
     armoured.put(TdcRatings.ORANGE, new String[] {RES_C, RES_P, RES_P, RES_P, RES_P, RES_C, RES_C, RES_1, RES_1});
     armoured.put(TdcRatings.YELLOW, new String[] {RES_C, RES_P, RES_P, RES_S, RES_S, RES_S, RES_C, RES_1, RES_1});
-      
+
     unarmoured.put(TdcRatings.WHITE,  new String[] {RES_1, RES_S, RES_S, RES_C, RES_C, RES_1, RES_E, RES_E, RES_E});
     unarmoured.put(TdcRatings.PINK,   new String[] {RES_C, RES_P, RES_P, RES_S, RES_C, RES_C, RES_1, RES_1, RES_E});
-    if (UnitInfo.isCreteRules()) {
+    if (UnitInfo.isCreteRules() || UnitInfo.isSHRules()) {
       unarmoured.put(TdcRatings.PURPLE, new String[] {RES_C, RES_P, RES_P, RES_P, RES_S, RES_C, RES_C, RES_E, RES_E});
     }
     else {

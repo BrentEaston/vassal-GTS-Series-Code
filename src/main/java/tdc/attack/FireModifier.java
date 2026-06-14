@@ -62,6 +62,15 @@ public class FireModifier {
   protected boolean doNotDisplay;
   protected String bonusMessage = null;
   protected boolean assaultDefenceOnly;
+  protected boolean isTerrain;
+
+  public boolean isTerrain() {
+    return isTerrain;
+  }
+
+  public void setTerrain(boolean terrain) {
+    isTerrain = terrain;
+  }
 
   public boolean isAssaultDefenceOnly() {
     return assaultDefenceOnly;
@@ -160,6 +169,10 @@ public class FireModifier {
   
   public boolean isUsedInMode(int mode) {
     return modes[mode];
+  }
+
+  public void setUsedInMode(int mode, boolean used) {
+    modes[mode] = used;
   }
 
   public boolean isHill() {

@@ -112,9 +112,9 @@ public class TdcWizard extends Decorator implements EditablePiece {
   public void mySetType(String type) {
     type = type.substring(ID.length());
     SequenceEncoder.Decoder st = new SequenceEncoder.Decoder(type, ';');
-    attackKey = st.nextKeyStroke(KeyStroke.getKeyStroke('A', java.awt.event.InputEvent.ALT_MASK));
-    infoKey = st.nextKeyStroke(KeyStroke.getKeyStroke('I', java.awt.event.InputEvent.ALT_MASK));
-    assaultKey = st.nextKeyStroke(KeyStroke.getKeyStroke('X', java.awt.event.InputEvent.ALT_MASK));
+    attackKey = st.nextKeyStroke(KeyStroke.getKeyStroke('A', java.awt.event.InputEvent.ALT_DOWN_MASK));
+    infoKey = st.nextKeyStroke(KeyStroke.getKeyStroke('I', java.awt.event.InputEvent.ALT_DOWN_MASK));
+    assaultKey = st.nextKeyStroke(KeyStroke.getKeyStroke('X', java.awt.event.InputEvent.ALT_DOWN_MASK));
   }
 
   public String myGetType() {
@@ -218,21 +218,21 @@ public class TdcWizard extends Decorator implements EditablePiece {
       int beachCmdCount = 0;
 
       if (nestsRemaining || obstaclesRemaining || gapsRemaining) {
-        beachCommand = new KeyCommand(AttackWizard.ATTACK_BEACH_DEFENCES, new NamedKeyStroke(KeyStroke.getKeyStroke('B', java.awt.event.InputEvent.ALT_MASK)),
+        beachCommand = new KeyCommand(AttackWizard.ATTACK_BEACH_DEFENCES, new NamedKeyStroke(KeyStroke.getKeyStroke('B', java.awt.event.InputEvent.ALT_DOWN_MASK)),
             this);
         keyCommands.add(beachCommand);
         beachCmdCount++;
       }
 
       if ("true".equals(dd)) {
-        seaStateCommand = new KeyCommand(AttackWizard.SEA_STATE_ATTACK, new NamedKeyStroke(KeyStroke.getKeyStroke('S', java.awt.event.InputEvent.ALT_MASK)),
+        seaStateCommand = new KeyCommand(AttackWizard.SEA_STATE_ATTACK, new NamedKeyStroke(KeyStroke.getKeyStroke('S', java.awt.event.InputEvent.ALT_DOWN_MASK)),
             this);
         keyCommands.add(seaStateCommand);
         beachCmdCount++;
       }
 
       if (nestsRemaining && !info.isLCS()) {
-        nestCommand = new KeyCommand(AttackWizard.RESISTANCE_NEST_ATTACK, new NamedKeyStroke(KeyStroke.getKeyStroke('N', java.awt.event.InputEvent.ALT_MASK)),
+        nestCommand = new KeyCommand(AttackWizard.RESISTANCE_NEST_ATTACK, new NamedKeyStroke(KeyStroke.getKeyStroke('N', java.awt.event.InputEvent.ALT_DOWN_MASK)),
             this);
         keyCommands.add(nestCommand);
         beachCmdCount++;
@@ -240,7 +240,7 @@ public class TdcWizard extends Decorator implements EditablePiece {
 
       if (info.isLandingCraft() && obstaclesRemaining) {
         obstacleCommand = new KeyCommand(AttackWizard.BEACH_OBSTACLES_ATTACK, new NamedKeyStroke(
-            KeyStroke.getKeyStroke('O', java.awt.event.InputEvent.ALT_MASK)), this);
+            KeyStroke.getKeyStroke('O', java.awt.event.InputEvent.ALT_DOWN_MASK)), this);
         keyCommands.add(obstacleCommand);
         beachCmdCount++;
       }

@@ -65,7 +65,7 @@ public class TdcPieceMover extends PieceMover {
     String activeLevel = p.getProperty("Active_Level") + "";
     if (markLevel.equals("1") && activeLevel.equals("2")) {
       p.setProperty(Properties.SNAPSHOT, ((PropertyExporter) p).getProperties());
-      return p.keyEvent(KeyStroke.getKeyStroke('K', InputEvent.CTRL_MASK));
+      return p.keyEvent(KeyStroke.getKeyStroke('K', InputEvent.CTRL_DOWN_MASK));
     }
     else {
       return new NullCommand();

@@ -28,6 +28,7 @@ import VASSAL.counters.BasicPiece;
 import VASSAL.counters.GamePiece;
 import VASSAL.counters.Stack;
 import net.miginfocom.swing.MigLayout;
+import tdc.attack.AttackModel;
 import tdc.attack.FireModifier;
 import terrain.TerrainBasicPiece;
 
@@ -44,6 +45,7 @@ public class UnitInfo {
 
   protected static final String TRUE = "true";
   protected static final String CLOSED = "closed";
+
 
   protected static HashMap<String, TerrainInfo> terrainInfo, terrainInfoArmoured;
   protected static HashMap<String, TerrainInfo> terrainInfoRubble; // Use TerrainInfo to mark as -1 hexs subject to Rubble
@@ -74,6 +76,7 @@ public class UnitInfo {
   protected boolean embanked;
   protected boolean sunken;
   protected boolean inCommand;
+  protected boolean autoCommand;
   protected boolean nonFormationCommand;
   protected boolean rubbled;
   protected boolean activated;
@@ -156,7 +159,7 @@ public class UnitInfo {
   }
 
   public static boolean isGTS2Rules() {
-    return isTgdRules() || isTinianRules() || isCreteRules() || isAmdRules();
+    return isTgdRules() || isTinianRules() || isCreteRules() || isAmdRules() || isSHRules() || isSalernoRules();
   }
 
   public static boolean isTgdRules() {
@@ -189,6 +192,14 @@ public class UnitInfo {
 
   public static boolean isBastogneRules() {
     return TdcProperties.RULES_BASTOGNE.equals(getRuleSet());
+  }
+
+  public static boolean isSHRules() {
+    return TdcProperties.RULES_SEPTEMBER_HOPE.equals(getRuleSet());
+  }
+
+  public static boolean isSalernoRules() {
+    return TdcProperties.RULES_SALERNO.equals(getRuleSet());
   }
 
   public static int getStandardUnitSize() {
@@ -1002,9 +1013,23 @@ public class UnitInfo {
     addAttackModifier(desc, val, false);
   }
 
+  protected void addAssaultOnlyAttackModifier(String desc, int val) {
+    addAssaultOnlyAttackModifier(desc, val, false);
+  }
+
   protected void addAttackModifier(String desc, int val, boolean doNotDisplay) {
     if (isAttacking()) {
       attackModifiers.add(new FireModifier(desc, val, doNotDisplay));
+    }
+  }
+
+  protected void addAssaultOnlyAttackModifier(String desc, int val, boolean doNotDisplay) {
+    if (isAttacking()) {
+      final FireModifier f = new FireModifier(desc, val, doNotDisplay);
+      f.setUsedInMode(AttackModel.MODE_DIRECT, false);
+      f.setUsedInMode(AttackModel.MODE_OPPORTUNITY, false);
+      f.setUsedInMode(AttackModel.MODE_INDIRECT, false);
+      attackModifiers.add(f);
     }
   }
 
@@ -1187,6 +1212,7 @@ public class UnitInfo {
     final CommandRangeChecker crc = new CommandRangeChecker(unit, this);
     nonFormationCommand = crc.isNonFormationCommand();
     inCommand = crc.inCommand();
+    autoCommand = crc.isAlwaysInCommand();
     if (!inCommand) {
       if (isCommando()) {
         adjustSpecialTqr("Commando OOC", -3);
@@ -1504,6 +1530,7 @@ public class UnitInfo {
             suppressed = true;
             setFireRating("Suppressed", "No");
             adjustAssaultRating("Suppressed", -2);
+            addAssaultOnlyAttackModifier("Supressed", -2);
             adjustTqrRating("Suppressed", -1);
             setMoveRating("Suppressed", "No");
           }
@@ -1627,37 +1654,40 @@ public class UnitInfo {
 
     // 1AB drop zone closed
     if (TdcProperties.DIVISION_1AB.equals(division)) {
-      if (CLOSED.equals(unit.getProperty(TdcProperties.SDZ_1AB))) {
+      if (TdcProperties.SDZ_CLOSED.equals(unit.getProperty(TdcProperties.SDZ_1AB))) {
         adjustSpecialTqr("Drop Zone Closed", -1);
       }
     }
     // 82AB Drop zone closed
     else if (TdcProperties.DIVISION_82AB.equals(division)) {
-      if (CLOSED.equals(unit.getProperty(TdcProperties.SDZ_82AB))) {
+      if (TdcProperties.SDZ_CLOSED.equals(unit.getProperty(TdcProperties.SDZ_82AB))) {
         adjustSpecialTqr("Drop Zone Closed", -1);
       }
     }
     // 101st Drop zone closed
     else if (TdcProperties.DIVISION_101AB.equals(division)) {
-      if (CLOSED.equals(unit.getProperty(TdcProperties.SDZ_101AB))) {
+      if (TdcProperties.SDZ_CLOSED.equals(unit.getProperty(TdcProperties.SDZ_101AB))) {
         adjustSpecialTqr("Drop Zone Closed", -1);
       }
     }
     // 52nd AL drop zone closed
     else if (TdcProperties.DIVISION_52AL.equals(division)) {
-      if (CLOSED.equals(unit.getProperty(TdcProperties.SDZ_52AL))) {
+      if (TdcProperties.SDZ_CLOSED.equals(unit.getProperty(TdcProperties.SDZ_52AL))) {
         adjustSpecialTqr("Drop Zone Closed", -1);
       }
     }
     // 43rd or Guards Armoured and Club Route closed
     else if (TdcProperties.DIVISION_43RD.equals(division) || TdcProperties.DIVISION_GDS.equals(division)) {
-      if (CLOSED.equals(unit.getProperty(TdcProperties.CLUB_ROUTE))) {
+      if (TdcProperties.CLUB_ROUTE_ATTACKED.equals(unit.getProperty(TdcProperties.CLUB_ROUTE))) {
+        adjustSpecialTqr("Club Route Attacked", -1);
+      }
+      else if (TdcProperties.CLUB_ROUTE_CLOSED.equals(unit.getProperty(TdcProperties.CLUB_ROUTE))) {
         adjustSpecialTqr("Club Route Closed", -2);
       }
     }
     // 9ss or 10ss south of closed Arnhem bridge
     else if (TdcProperties.DIVISION_HOH.equals(division) || TdcProperties.DIVISION_FR.equals(division)) {
-      if (CLOSED.equals(unit.getProperty(TdcProperties.ARNHEM_BRIDGE))) {
+      if (TdcProperties.ARNHEM_BRIDGE_CLOSED.equals(unit.getProperty(TdcProperties.ARNHEM_BRIDGE))) {
         if (isSouthOfRhine(unit)) {
           adjustSpecialTqr("South of Closed Arnhem Bridge", -1);
         }
@@ -1875,6 +1905,10 @@ public class UnitInfo {
 
   public boolean isInCommand() {
     return inCommand;
+  }
+
+  public boolean isAutoCommand() {
+    return autoCommand;
   }
 
   public boolean isNonFormationCommand() {

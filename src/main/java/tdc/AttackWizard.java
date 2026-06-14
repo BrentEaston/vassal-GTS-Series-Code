@@ -32,7 +32,6 @@ import VASSAL.command.ChangeTracker;
 import VASSAL.command.Command;
 import VASSAL.command.CommandEncoder;
 import VASSAL.configure.BooleanConfigurer;
-import VASSAL.configure.StringEnumConfigurer;
 import VASSAL.counters.BasicPiece;
 import VASSAL.counters.Decorator;
 import VASSAL.counters.Embellishment;
@@ -80,6 +79,7 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
   public static final String WIZARD_MODIFIER = "Mod";
   public static final String WIZARD_REPORT = "Report";
   public static final String WIZARD_TARGET = "Target";
+  public static final String WIZARD_ASSAULT = "Assault";
 
   public static final String AUTO_CLOSE = "AutoClose";
   public static boolean SHOW_WIZARD = true;
@@ -698,6 +698,15 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
     GameModule.getGameModule().sendAndLog(modeCmd);
   }
 
+  // Assault Options have changed, let other clients know
+  public void assaultOptionsChanged(boolean newUseAssault, boolean oldUseAssault, boolean newDefendAssault, boolean oldDefendAssault) {
+    final Command changeCommand = new WizardAssaultOptionCommand(this, newUseAssault, oldUseAssault, newDefendAssault, oldDefendAssault);
+    final Command reportCmd = getChatCommand(myModel.getAssaultOptionsString(), false);
+    reportCmd.execute();
+    changeCommand.append(reportCmd);
+    GameModule.getGameModule().sendAndLog(changeCommand);
+  }
+
   // Our Dialog is closing, inform other clients
   public void wizardCloses() {
     getMyThread().setVisible(false);
@@ -727,6 +736,12 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
   // Another client has changed mode
   public void changeMode(int mode) {
     myView.changeMode(mode);
+  }
+
+
+  // Another client has changed the Assault options
+  public void changeAssaultOptions(boolean useAssault, boolean defendAssault) {
+    myView.updateAssaultOptions(useAssault, defendAssault);
   }
 
   public int getMode() {
@@ -923,6 +938,9 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
         final int value = sd.nextInt(0);
         return new WizardModifierCommand(this, id, value);
       }
+      else if (WIZARD_ASSAULT.equals(command)) {
+        return new WizardAssaultOptionCommand(this, sd.nextBoolean(false), sd.nextBoolean(false), sd.nextBoolean(false), sd.nextBoolean(false));
+      }
 
     }
     return null;
@@ -950,6 +968,10 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
       else if (c instanceof WizardModifierCommand) {
         final WizardModifierCommand wmc = (WizardModifierCommand) c;
         se.append(wmc.getModifierId()).append(com.getNewValue());
+      }
+      else if (c instanceof WizardAssaultOptionCommand) {
+        final WizardAssaultOptionCommand waoc = (WizardAssaultOptionCommand) c;
+        se.append(waoc.newUseAssault).append(waoc.oldUseAssault).append(waoc.newDefendAssault).append(waoc.oldDefendAssault);
       }
       return ATTACK_WIZARD_COMMAND + se.getValue();
     }
@@ -1026,7 +1048,8 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
         }
         // Place barrage if not 9 and indirect, unless one is already there
         // Flip the existing or new barrage to heavy if CompanyBonus is on
-        if (roll!=9 && myModel.isIndirectFire()) {
+        // Don't place barrage markers in Assault mode
+        if (roll!=9 && myModel.isIndirectFire() && !myModel.isAssaultMode()) {
           boolean reportAddBarrage = false;
           if (!map.terrainMap.isHexBarraged(targetPoint)) {
             GamePiece newBarragePiece = myModel.getNewBarragePiece();
@@ -1492,6 +1515,32 @@ public class AttackWizard extends AbstractConfigurable implements Drawable, Mous
   public static class BeachPiece extends BasicPiece {
     public BeachPiece(int specialAttackType) {
       super(BasicPiece.ID + ";;" + SPECIAL_ATTACK_ICONS[specialAttackType] + ";" + SPECIAL_ATTACK_ICONS[specialAttackType] + ";");
+    }
+  }
+
+  // Change the Assault Mode options
+  public static class WizardAssaultOptionCommand extends AttackWizardCommand {
+    protected boolean oldUseAssault;
+    protected boolean newUseAssault;
+    protected boolean oldDefendAssault;
+    protected boolean newDefendAssault;
+
+    public WizardAssaultOptionCommand(AttackWizard wizard, boolean newUseAssault, boolean oldUseAssault, boolean newDefendAssault, boolean oldDefendAssault) {
+      super(wizard, WIZARD_ASSAULT);
+      this.oldDefendAssault = oldDefendAssault;
+      this.newDefendAssault = newDefendAssault;
+      this.oldUseAssault = oldUseAssault;
+      this.newUseAssault = newUseAssault;
+    }
+
+    @Override
+    protected void executeCommand() {
+      wizard.changeAssaultOptions(newUseAssault, newDefendAssault);
+    }
+
+    @Override
+    protected Command myUndoCommand() {
+      return new WizardAssaultOptionCommand(wizard, oldUseAssault, newUseAssault, oldDefendAssault, newDefendAssault);
     }
   }
 }

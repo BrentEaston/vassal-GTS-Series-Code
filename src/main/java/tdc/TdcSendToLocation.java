@@ -57,6 +57,8 @@ import VASSAL.counters.PieceFilter;
 import VASSAL.counters.Properties;
 import VASSAL.counters.PropertiesPieceFilter;
 import VASSAL.counters.Stack;
+import VASSAL.script.expression.AuditTrail;
+import VASSAL.script.expression.Auditable;
 import VASSAL.tools.FormattedString;
 import VASSAL.tools.SequenceEncoder;
 
@@ -242,13 +244,13 @@ public class TdcSendToLocation extends Decorator implements EditablePiece {
   
   protected Point getDestination() {
     GamePiece outer = Decorator.getOutermost(this);
-    return offsetDestination(Integer.parseInt(x.getText(outer)), Integer.parseInt(y.getText(outer)));
+    return offsetDestination(Integer.parseInt(x.getText(outer, null, (AuditTrail) null)), Integer.parseInt(y.getText(outer, null, (AuditTrail) null)));
   }
   
   protected Point offsetDestination(int x, int y) {
     GamePiece outer = Decorator.getOutermost(this);
-    int xPos = x + Integer.parseInt(xIndex.getText(outer)) * Integer.parseInt(xOffset.getText(outer));
-    int yPos = y + Integer.parseInt(yIndex.getText(outer)) * Integer.parseInt(yOffset.getText(outer));
+    int xPos = x + Integer.parseInt(xIndex.getText(outer, null, (AuditTrail)null)) * Integer.parseInt(xOffset.getText(outer, null, (AuditTrail) null));
+    int yPos = y + Integer.parseInt(yIndex.getText(outer, null, (AuditTrail) null)) * Integer.parseInt(yOffset.getText(outer, null, (AuditTrail) null));
     return new Point(xPos, yPos);
   }
 
@@ -257,7 +259,7 @@ public class TdcSendToLocation extends Decorator implements EditablePiece {
    */
   protected Command sendToCounter() {
     Command c = null;
-    PieceFilter filter = PropertiesPieceFilter.parse(new FormattedString(propertyMatch).getText(Decorator.getOutermost(this)));
+    PieceFilter filter = PropertiesPieceFilter.parse(new FormattedString(propertyMatch).getText(Decorator.getOutermost(this), null, (AuditTrail) null));
     GamePiece target = null;
     for (GamePiece piece : GameModule.getGameModule().getGameState().getAllPieces()) {
       if (piece instanceof Stack) {

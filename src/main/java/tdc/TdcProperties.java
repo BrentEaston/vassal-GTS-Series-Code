@@ -38,6 +38,7 @@ public interface TdcProperties {
   String BLACK_STRIPE_IND = "BlackStripeInd"; // Black Stripe Independent
   String
     ALWAYS_IN_COMMAND = "AlwaysInCommand";             // Unit is always in command
+  String AUTO_COMMAND = "AutoCommand";
   String
     NON_FORMATION_COMMAND = "NonFormationCommand";     // Unit can be in command to leaders of other formations in division
   String
@@ -160,6 +161,8 @@ public interface TdcProperties {
   String RULES_AMD = "AMD";
   String RULES_SAAR = "SAAR";
   String RULES_BASTOGNE = "BASTOGNE";
+  String RULES_SEPTEMBER_HOPE = "SH";
+  String RULES_SALERNO = "SALERNO";
   
   String SUB_RULESET = "SubRuleset";
   String RULES_GJS = "1";
@@ -172,13 +175,22 @@ public interface TdcProperties {
   String TGD_INTERDICT_LIMIT_CLEAR = "InterdictLimitClear";
   String TGD_INTERDICT_LIMIT_OVERCAST = "InterdictLimitOvercast";
 
-  String SDZ_1AB = "SDZ-1AB";
-  String SDZ_52AL = "SDZ-52AL";
-  String SDZ_82AB = "SDZ-82AB";
-  String SDZ_101AB = "SDZ-101AB";
-  String SDZ_POLISH = "SDZ-PB";
-  String CLUB_ROUTE = "Club-Route";
-  String ARNHEM_BRIDGE = "Arnhem-Bridge";
+  String SDZ_1AB = "SDZ_1AB";
+  String SDZ_52AL = "SDZ_52AL";
+  String SDZ_82AB = "SDZ_82AB";
+  String SDZ_101AB = "SDZ_101AB";
+  String SDZ_POLISH = "SDZ_PB";
+
+  String SDZ_OPEN = "1";
+  String SDZ_CLOSED = "2";
+
+  String CLUB_ROUTE = "Club_Route";
+  String CLUB_ROUTE_OPEN = "1";
+  String CLUB_ROUTE_ATTACKED = "2";
+  String CLUB_ROUTE_CLOSED = "3";
+  String ARNHEM_BRIDGE = "Arnhem_Bridge";
+  String ARNHEM_BRIDGE_OPEN = "1";
+  String ARNHEM_BRIDGE_CLOSED = "2";
   String COMMAND_BREAKDOWN = "Command-Breakdown";
   String EINDHOVEN_CHILL = "Eindhoven-Chill";
   String EINDHOVEN_IND = "1";

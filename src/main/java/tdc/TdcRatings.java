@@ -332,6 +332,10 @@ public class TdcRatings extends Decorator implements EditablePiece {
       final String flakRating = ratings == null ? null : ratings.get(FLAK_RATING);
       return String.valueOf(flakRating != null && flakRating.length() > 0 && ! flakRating.equals("No"));
     }
+    else if (TdcProperties.AUTO_COMMAND.equals(key)) {
+      final UnitInfo info = new UnitInfo(Decorator.getOutermost(this), true);
+      return String.valueOf(info.isAutoCommand());
+    }
 
     return super.getProperty(key);
   }

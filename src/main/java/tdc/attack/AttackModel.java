@@ -294,7 +294,7 @@ public class AttackModel {
   }
 
   public boolean canIndirectFireScatter() {
-    return canIndirectFireScatter;
+    return canIndirectFireScatter && ! isAssaultMode();
   }
 
   public boolean isRubblePossible() {
@@ -507,7 +507,12 @@ public class AttackModel {
     else if (mode == MODE_INDIRECT) {
       return "INDIRECT";
     }
-    return "OPPORTUNITY";
+    else if (mode == MODE_OPPORTUNITY) {
+      return "OPPORTUNITY";
+    }
+    else {
+      return "ASSAULT";
+    }
   }
 
   public String getSmlModeString() {
@@ -528,6 +533,11 @@ public class AttackModel {
     }
   }
 
+  public String getAssaultOptionsString() {
+    return "Using " + (isAssaultRating() ? "assault" : "fire") + " rating, " + (isDefendingAssault() ? "defending against" : "performing") + " assault.";
+  }
+
+
   public void changeMode(int newMode) {
     mode = newMode;
     update();
@@ -547,7 +557,8 @@ public class AttackModel {
       return;
     }
 
-    modeEnabled[MODE_ASSAULT] = sourceInfo.canAssault() && getRange() == 1;
+    // Change to enable the Assault Button for units that can't assault so they can use it to defend against an assault
+    modeEnabled[MODE_ASSAULT] = getRange() == 1;
 
     if (sourceInfo.isMortar()) {
       mode = MODE_INDIRECT;
@@ -729,6 +740,13 @@ public class AttackModel {
         }
       }
       text.add("Weapon Class - " + sourceInfo.getWeaponClass(getFireRatingColour()) + " (" + getFireRatingColour() + ") v " + getTargetArmourString());
+
+      if (isAssaultMode()) {
+        if (isDefendingAssault()) {
+          text.add("Defending against Assault");
+        }
+      }
+
       String s = "Fire Rating " + getFireRating() + " [Base " + getBaseFireRating();
       boolean first = true;
       for (FireModifier f : getAttackModifiers()) {
@@ -822,7 +840,7 @@ public class AttackModel {
       if (canCounterBatteryFire) {
         addAttackModifier(new FireModifier(COUNTER_BATTERY_FIRE, -2, FireModifier.ONOFF, false, true, false, this));
       }
-      if (isNight) {
+      if (isNight && ! UnitInfo.isSHRules()) {
         if (TdcProperties.DIVISION_6AB.equals(division) || TdcProperties.DIVISION_12SS.equals(division)
           || TdcProperties.DIVISION_82AB.equals(division) || TdcProperties.DIVISION_101AB.equals(division)) {
           addAttackModifier(new FireModifier(division + " Night bonus", 3, FireModifier.ONOFF, true, true, true, true, this));
@@ -872,7 +890,9 @@ public class AttackModel {
         }
 
         if ((!info.isInColumn() && terrainModifier != 0) || terrainModifier > 0) {
-          addDefenceModifier(new FireModifier(terrainInfo.getTerrainPrintable() + (UnitInfo.isTgdRules() ? " ( " + targetInfos.get(i).getArmourString() + ")" : ""), terrainModifier, targets.get(i)));
+          final FireModifier f = new FireModifier(terrainInfo.getTerrainPrintable() + (UnitInfo.isTgdRules() ? " ( " + targetInfos.get(i).getArmourString() + ")" : ""), terrainModifier, targets.get(i));
+          f.setTerrain(true);
+          addDefenceModifier(f);
         }
 
         int rangeBonus = 0;
@@ -969,7 +989,7 @@ public class AttackModel {
         }
         // Yucko, but need to do this to keep the order the same now that non-adj Ridge option
         // if (i == targets.size()-1) {
-        defenceModifier = new FireModifier(BASE_DEFENCE_RATING, targetInfos.get(i).getDefenceRating(), FireModifier.BASIC, true, true, true, this, targets.get(i));
+        defenceModifier = new FireModifier(BASE_DEFENCE_RATING, targetInfos.get(i).getDefenceRating(), FireModifier.BASIC, true, true, true, true, this, targets.get(i));
         addDefenceModifier(defenceModifier);
 
         //}
@@ -990,6 +1010,14 @@ public class AttackModel {
       addDefenceModifier(f);
 
     }
+
+    // -ve Terrain Modifiers do not apply when defending assault
+    for (final FireModifier f : defenceModifiers) {
+      if (f.isTerrain() && f.getValue() < 0) {
+        f.setUsedInMode(MODE_ASSAULT, !isDefendingAssault());
+      }
+    }
+
     return defenceModifiers;
   }
 

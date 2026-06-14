@@ -51,6 +51,7 @@ public class AttackView {
   protected JPanel specialAttack = new JPanel();
   protected JCheckBox checkBoxAssaultFireRating = new JCheckBox();
   protected JCheckBox defendingAssault = new JCheckBox();
+  protected boolean updateInProgress;
 
   public AttackView(AttackModel model, AttackWizard owner) {
     myModel = model;
@@ -101,6 +102,16 @@ public class AttackView {
     refresh();
     pack();    
   }
+
+  // Assault Options have been changed by another client
+  // Listeners on the checkboxes will update us correctly.
+  public void changeAssaultOptions(boolean useAssaultOption, boolean defendAssaultOption) {
+    myModel.setIsAssaultRating(useAssaultOption);
+    myModel.setDefendingAssault(defendAssaultOption);
+    myModel.update();
+    refresh();
+  }
+
   /**
    * Something in the model has changed, refresh the display
    */
@@ -117,6 +128,10 @@ public class AttackView {
     specialAttack.setVisible(myModel.canCounterBatteryFire() || myModel.isAirPower() || myModel.isPartisanAttack());
     checkBoxAssaultFireRating.setVisible(myModel.isAssaultMode());
     defendingAssault.setVisible(myModel.isAssaultMode());
+    updateInProgress = true;
+    checkBoxAssaultFireRating.setSelected(myModel.isAssaultRating());
+    defendingAssault.setSelected(myModel.isDefendingAssault());
+    updateInProgress = false;
   }
   
   protected void pack() {
@@ -194,13 +209,17 @@ public class AttackView {
     checkBoxAssaultFireRating.setSelected(false);
     checkBoxAssaultFireRating.setText("Use Assault Rating?");
     checkBoxAssaultFireRating.addActionListener(e -> {
-      myModel.setIsAssaultRating(checkBoxAssaultFireRating.isSelected());
-      myModel.update();
-      refresh();
+      if (!updateInProgress) {
+        assaultOptionsChanged();
       }
-    );
+    });
 
     defendingAssault = new JCheckBox("Defending Assault?");
+    defendingAssault.addActionListener(e -> {
+      if (! updateInProgress) {
+        assaultOptionsChanged();
+      }
+    });
 
     ratingPanel.add(myWizard.getResolver().getControls(), "wrap");
 
@@ -282,7 +301,37 @@ public class AttackView {
     mainPanel.add(botPanel, WIDTH+",wrap");
   }
   
-  
+
+  protected void assaultOptionsChanged() {
+    final boolean newUseAssault = checkBoxAssaultFireRating.isSelected();
+    final boolean oldUseAssault = myModel.isAssaultRating();
+    final boolean newDefendAssault = defendingAssault.isSelected();
+    final boolean oldDefendAssault = myModel.isDefendingAssault();
+
+    updateAssaultOptions(newUseAssault, newDefendAssault);
+
+    // Let other clients know.
+    myWizard.assaultOptionsChanged(newUseAssault, oldUseAssault, newDefendAssault, oldDefendAssault);
+  }
+
+  public void updateAssaultOptions(boolean newUseAssault, boolean newDefendAssault) {
+    myModel.setIsAssaultRating(newUseAssault);
+    myModel.setDefendingAssault(newDefendAssault);
+    myModel.update();
+
+    for (FireModifier mod : myModel.getDefenceModifiers()) {
+      if (mod.isTerrain()) {
+        mod.getControls(3).setVisible(mod.isOwner(myModel.getTarget()) && (mod.getValue() >= 0 || !myModel.isDefendingAssault()));
+      }
+      else {
+        final boolean vis = mod.isOwner(myModel.getTarget());
+        mod.getControls(myModel.getMode()).setVisible(mod.isOwner(myModel.getTarget()));
+      }
+    }
+
+    myModel.update();
+    refresh();
+  }
   protected void buildModePanels(int mode) {
     attackPanels[mode] = new JPanel(new MigLayout("wrap 1, hidemode 3"));
     attackPanels[mode].setBorder(BorderFactory.createEtchedBorder());    
@@ -299,7 +348,8 @@ public class AttackView {
     
     for (FireModifier mod : myModel.getDefenceModifiers()) {
       if (mod.isUsedInMode(mode)) {
-        defencePanels[mode].add(mod.getControls(mode));
+        final JPanel controls = mod.getControls(mode);
+        defencePanels[mode].add(controls);
       }
     }
  
